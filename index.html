@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Proyectos educativos</title>
+
+  <style>
+    :root {
+      --color-principal: #2563eb;
+      --color-principal-oscuro: #1d4ed8;
+      --color-secundario: #7c3aed;
+      --color-fondo: #f1f5f9;
+      --color-tarjeta: #ffffff;
+      --color-texto: #0f172a;
+      --color-texto-suave: #64748b;
+      --color-borde: #dbe3ee;
+      --color-error: #b91c1c;
+      --sombra: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--color-texto);
+      background: var(--color-fondo);
+    }
+
+    header {
+      padding: 55px 20px 75px;
+      text-align: center;
+      color: white;
+      background:
+        linear-gradient(
+          135deg,
+          var(--color-principal),
+          var(--color-secundario)
+        );
+    }
+
+    header h1 {
+      margin: 0 0 12px;
+      font-size: clamp(32px, 6vw, 55px);
+    }
+
+    header p {
+      max-width: 750px;
+      margin: 0 auto;
+      font-size: 18px;
+      line-height: 1.6;
+      opacity: 0.95;
+    }
+
+    main {
+      width: min(1100px, calc(100% - 30px));
+      margin: -38px auto 50px;
+    }
+
+    .panel {
+      padding: 22px;
+      background: white;
+      border: 1px solid var(--color-borde);
+      border-radius: 18px;
+      box-shadow: var(--sombra);
+    }
+
+    .barra-superior {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .buscador {
+      flex: 1;
+      position: relative;
+    }
+
+    .buscador input {
+      width: 100%;
+      padding: 14px 16px 14px 45px;
+      font-size: 16px;
+      color: var(--color-texto);
+      background: #f8fafc;
+      border: 1px solid var(--color-borde);
+      border-radius: 12px;
+      outline: none;
+    }
+
+    .buscador input:focus {
+      border-color: var(--color-principal);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .icono-busqueda {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      font-size: 20px;
+    }
+
+    #botonActualizar {
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: bold;
+      color: white;
+      background: var(--color-principal);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    #botonActualizar:hover {
+      background: var(--color-principal-oscuro);
+    }
+
+    #botonActualizar:disabled {
+      cursor: wait;
+      opacity: 0.7;
+    }
+
+    .resumen {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 22px 0 15px;
+    }
+
+    .resumen h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .contador {
+      padding: 7px 12px;
+      color: var(--color-principal);
+      font-size: 14px;
+      font-weight: bold;
+      background: #eff6ff;
+      border-radius: 20px;
+    }
+
+    .proyectos {
+      display: grid;
+      grid-template-columns:
+        repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .proyecto {
+      display: flex;
+      flex-direction: column;
+      min-height: 210px;
+      padding: 22px;
+      color: inherit;
+      text-decoration: none;
+      background: var(--color-tarjeta);
+      border: 1px solid var(--color-borde);
+      border-radius: 16px;
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .proyecto:hover {
+      transform: translateY(-5px);
+      border-color: var(--color-principal);
+      box-shadow: 0 15px 35px rgba(15, 23, 42, 0.12);
+    }
+
+    .proyecto-icono {
+      width: 55px;
+      height: 55px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 16px;
+      font-size: 28px;
+      background: #eff6ff;
+      border-radius: 14px;
+    }
+
+    .proyecto h3 {
+      margin: 0 0 10px;
+      font-size: 21px;
+    }
+
+    .proyecto p {
+      margin: 0 0 20px;
+      color: var(--color-texto-suave);
+      line-height: 1.5;
+    }
+
+    .abrir {
+      margin-top: auto;
+      color: var(--color-principal);
+      font-weight: bold;
+    }
+
+    .estado {
+      padding: 45px 20px;
+      text-align: center;
+      color: var(--color-texto-suave);
+      background: #f8fafc;
+      border: 2px dashed var(--color-borde);
+      border-radius: 15px;
+    }
+
+    .estado-icono {
+      display: block;
+      margin-bottom: 12px;
+      font-size: 45px;
+    }
+
+    .error {
+      color: var(--color-error);
+      background: #fef2f2;
+      border-color: #fecaca;
+    }
+
+    .oculto {
+      display: none;
+    }
+
+    footer {
+      padding: 25px;
+      text-align: center;
+      color: var(--color-texto-suave);
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding-top: 40px;
+      }
+
+      .barra-superior {
+        flex-direction: column;
+      }
+
+      #botonActualizar {
+        width: 100%;
+      }
+
+      .resumen {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>💻 Proyectos educativos</h1>
+
+    <p>
+      Colección de proyectos desarrollados con HTML,
+      CSS y JavaScript.
+    </p>
+  </header>
+
+  <main>
+    <section class="panel">
+
+      <div class="barra-superior">
+        <div class="buscador">
+          <span class="icono-busqueda">🔎</span>
+
+          <input
+            type="search"
+            id="buscador"
+            placeholder="Buscar un proyecto..."
+            autocomplete="off"
+          >
+        </div>
+
+        <button type="button" id="botonActualizar">
+          ↻ Actualizar
+        </button>
+      </div>
+
+      <div class="resumen">
+        <h2>Proyectos disponibles</h2>
+
+        <span class="contador" id="contador">
+          Cargando...
+        </span>
+      </div>
+
+      <div id="estado" class="estado">
+        <span class="estado-icono">⏳</span>
+        Buscando proyectos...
+      </div>
+
+      <section
+        id="contenedorProyectos"
+        class="proyectos oculto"
+        aria-live="polite"
+      ></section>
+
+    </section>
+  </main>
+
+  <footer>
+    Sitio educativo creado con GitHub Pages
+  </footer>
+
+  <script>
+    "use strict";
+
+    /*
+      CONFIGURACIÓN
+
+      Cuando el sitio está publicado en una dirección
+      como:
+
+      https://usuario.github.io/proyectos-web/
+
+      el usuario y el repositorio se detectan
+      automáticamente.
+
+      Solo debes escribirlos manualmente si pruebas
+      el archivo localmente o utilizas un dominio propio.
+    */
+
+    const CONFIGURACION = {
+      usuario: "",
+      repositorio: "",
+      rama: "main",
+
+      /*
+        Estas carpetas no aparecerán como proyectos.
+      */
+
+      carpetasIgnoradas: [
+        ".github",
+        "assets",
+        "css",
+        "js",
+        "img",
+        "images",
+        "recursos",
+        "archivos"
+      ]
+    };
+
+    const contenedorProyectos =
+      document.getElementById("contenedorProyectos");
+
+    const elementoEstado =
+      document.getElementById("estado");
+
+    const elementoContador =
+      document.getElementById("contador");
+
+    const buscador =
+      document.getElementById("buscador");
+
+    const botonActualizar =
+      document.getElementById("botonActualizar");
+
+    let proyectosEncontrados = [];
+
+    /**
+     * Obtiene el usuario y el repositorio.
+     * Primero revisa la configuración manual.
+     * Después intenta detectarlos desde github.io.
+     */
+    function obtenerDatosRepositorio() {
+      let usuario = CONFIGURACION.usuario.trim();
+      let repositorio =
+        CONFIGURACION.repositorio.trim();
+
+      const estaEnGitHubPages =
+        window.location.hostname.endsWith(
+          ".github.io"
+        );
+
+      if (
+        estaEnGitHubPages &&
+        (!usuario || !repositorio)
+      ) {
+        usuario =
+          window.location.hostname.split(".")[0];
+
+        const partesRuta =
+          window.location.pathname
+            .split("/")
+            .filter(Boolean);
+
+        /*
+          Proyecto normal:
+          usuario.github.io/repositorio/
+
+          Página principal del usuario:
+          usuario.github.io/
+        */
+
+        repositorio =
+          partesRuta[0] ||
+          `${usuario}.github.io`;
+      }
+
+      if (!usuario || !repositorio) {
+        throw new Error(
+          "No se pudo detectar el usuario y el " +
+          "repositorio. Escribe esos datos en " +
+          "CONFIGURACION al inicio del JavaScript."
+        );
+      }
+
+      return {
+        usuario,
+        repositorio,
+        rama: CONFIGURACION.rama
+      };
+    }
+
+    /**
+     * Convierte el nombre de una carpeta en un
+     * título más agradable.
+     *
+     * Ejemplo:
+     * juego-de-culebra -> Juego De Culebra
+     */
+    function formatearNombre(nombreCarpeta) {
+      return nombreCarpeta
+        .replace(/[-_]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .replace(
+          /\b\p{L}/gu,
+          letra => letra.toUpperCase()
+        );
+    }
+
+    /**
+     * Determina si una carpeta debe mostrarse.
+     */
+    function carpetaPermitida(carpeta) {
+      const nombreMinuscula =
+        carpeta.name.toLowerCase();
+
+      const ignoradas =
+        CONFIGURACION.carpetasIgnoradas.map(
+          nombre => nombre.toLowerCase()
+        );
+
+      return (
+        carpeta.type === "dir" &&
+        !carpeta.name.startsWith(".") &&
+        !ignoradas.includes(nombreMinuscula)
+      );
+    }
+
+    /**
+     * Construye la dirección relativa del proyecto.
+     */
+    function construirEnlace(nombreCarpeta) {
+      return `./${encodeURIComponent(nombreCarpeta)}/`;
+    }
+
+    /**
+     * Crea una tarjeta HTML para cada proyecto.
+     */
+    function crearTarjeta(proyecto) {
+      const enlace = document.createElement("a");
+
+      enlace.className = "proyecto";
+      enlace.href = construirEnlace(proyecto.name);
+
+      const icono = document.createElement("div");
+      icono.className = "proyecto-icono";
+      icono.textContent = "🌐";
+
+      const titulo = document.createElement("h3");
+      titulo.textContent =
+        formatearNombre(proyecto.name);
+
+      const descripcion =
+        document.createElement("p");
+
+      descripcion.textContent =
+        "Proyecto web desarrollado con HTML, " +
+        "CSS y JavaScript.";
+
+      const textoAbrir =
+        document.createElement("span");
+
+      textoAbrir.className = "abrir";
+      textoAbrir.textContent = "Abrir proyecto →";
+
+      enlace.append(
+        icono,
+        titulo,
+        descripcion,
+        textoAbrir
+      );
+
+      return enlace;
+    }
+
+    /**
+     * Dibuja las tarjetas de proyectos.
+     */
+    function mostrarProyectos(lista) {
+      contenedorProyectos.innerHTML = "";
+
+      if (lista.length === 0) {
+        contenedorProyectos.classList.add("oculto");
+
+        elementoEstado.className = "estado";
+        elementoEstado.classList.remove("oculto");
+
+        elementoEstado.innerHTML = `
+          <span class="estado-icono">📂</span>
+          No se encontraron proyectos.
+        `;
+
+        elementoContador.textContent = "0 proyectos";
+        return;
+      }
+
+      elementoEstado.classList.add("oculto");
+      contenedorProyectos.classList.remove("oculto");
+
+      lista.forEach(proyecto => {
+        contenedorProyectos.appendChild(
+          crearTarjeta(proyecto)
+        );
+      });
+
+      const palabra =
+        lista.length === 1
+          ? "proyecto"
+          : "proyectos";
+
+      elementoContador.textContent =
+        `${lista.length} ${palabra}`;
+    }
+
+    /**
+     * Consulta las carpetas del repositorio.
+     */
+    async function cargarProyectos() {
+      botonActualizar.disabled = true;
+      botonActualizar.textContent = "Buscando...";
+
+      contenedorProyectos.classList.add("oculto");
+
+      elementoEstado.className = "estado";
+      elementoEstado.classList.remove("oculto");
+
+      elementoEstado.innerHTML = `
+        <span class="estado-icono">⏳</span>
+        Buscando proyectos en GitHub...
+      `;
+
+      elementoContador.textContent = "Cargando...";
+
+      try {
+        const datos = obtenerDatosRepositorio();
+
+        const urlAPI =
+          "https://api.github.com/repos/" +
+          `${encodeURIComponent(datos.usuario)}/` +
+          `${encodeURIComponent(datos.repositorio)}/` +
+          "contents" +
+          `?ref=${encodeURIComponent(datos.rama)}`;
+
+        const respuesta = await fetch(urlAPI, {
+          cache: "no-store"
+        });
+
+        if (!respuesta.ok) {
+          if (respuesta.status === 404) {
+            throw new Error(
+              "No se encontró el repositorio. " +
+              "Comprueba el nombre del usuario, " +
+              "el repositorio y la rama."
+            );
+          }
+
+          if (respuesta.status === 403) {
+            throw new Error(
+              "GitHub rechazó temporalmente la " +
+              "consulta. Puede haberse alcanzado " +
+              "el límite de solicitudes de la API."
+            );
+          }
+
+          throw new Error(
+            `Error de GitHub: ${respuesta.status}`
+          );
+        }
+
+        const contenido = await respuesta.json();
+
+        if (!Array.isArray(contenido)) {
+          throw new Error(
+            "GitHub no devolvió una lista de archivos."
+          );
+        }
+
+        proyectosEncontrados = contenido
+          .filter(carpetaPermitida)
+          .sort((a, b) =>
+            a.name.localeCompare(
+              b.name,
+              "es",
+              { sensitivity: "base" }
+            )
+          );
+
+        buscador.value = "";
+        mostrarProyectos(proyectosEncontrados);
+
+      } catch (error) {
+        console.error(error);
+
+        proyectosEncontrados = [];
+
+        elementoContador.textContent = "Error";
+
+        elementoEstado.className = "estado error";
+        elementoEstado.classList.remove("oculto");
+
+        elementoEstado.innerHTML = `
+          <span class="estado-icono">⚠️</span>
+          <strong>No se pudieron cargar los proyectos.</strong>
+          <br><br>
+          ${error.message}
+        `;
+      } finally {
+        botonActualizar.disabled = false;
+        botonActualizar.textContent = "↻ Actualizar";
+      }
+    }
+
+    /**
+     * Filtra los proyectos mientras se escribe.
+     */
+    buscador.addEventListener("input", () => {
+      const texto =
+        buscador.value
+          .trim()
+          .toLowerCase();
+
+      const filtrados =
+        proyectosEncontrados.filter(proyecto => {
+          const nombre =
+            formatearNombre(proyecto.name)
+              .toLowerCase();
+
+          return nombre.includes(texto);
+        });
+
+      mostrarProyectos(filtrados);
+    });
+
+    botonActualizar.addEventListener(
+      "click",
+      cargarProyectos
+    );
+
+    cargarProyectos();
+  </script>
+
+</body>
+</html>
