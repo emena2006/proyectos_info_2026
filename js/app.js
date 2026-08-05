@@ -27,6 +27,25 @@ const REPOSITORIO_PREDETERMINADO = {
 
 let proyectos = [];
 
+function fetchConLimite(url, opciones = {}, milisegundos = 8000) {
+    const controlador = new AbortController();
+    const temporizador = setTimeout(() => controlador.abort(), milisegundos);
+    const configuracion = Object.assign({}, opciones, {
+        signal: controlador.signal
+    });
+
+    return fetch(url, configuracion).then(
+        respuesta => {
+            clearTimeout(temporizador);
+            return respuesta;
+        },
+        error => {
+            clearTimeout(temporizador);
+            throw error;
+        }
+    );
+}
+
 function crearRuta(ruta) {
     return ruta
         .split("/")
@@ -89,7 +108,7 @@ function detectarRepositorio() {
  */
 async function leerMicrositio(carpeta) {
     try {
-        const respuesta = await fetch(
+        const respuesta = await fetchConLimite(
             `./${crearRuta(carpeta)}/index.html`,
             { cache: "no-store" }
         );
@@ -100,10 +119,16 @@ async function leerMicrositio(carpeta) {
 
         const html = await respuesta.text();
         const documento = new DOMParser().parseFromString(html, "text/html");
-        const tituloDocumento = documento.querySelector("title")
-            ?.textContent.trim();
-        const descripcion = documento.querySelector('meta[name="description"]')
-            ?.getAttribute("content")?.trim();
+        const elementoTitulo = documento.querySelector("title");
+        const elementoDescripcion = documento.querySelector(
+            'meta[name="description"]'
+        );
+        const tituloDocumento = elementoTitulo
+            ? elementoTitulo.textContent.trim()
+            : "";
+        const descripcion = elementoDescripcion
+            ? (elementoDescripcion.getAttribute("content") || "").trim()
+            : "";
 
         return {
             carpeta,
@@ -123,7 +148,7 @@ async function leerMicrositio(carpeta) {
  */
 async function obtenerProyectosDesdeGitHub() {
     const { propietario, nombre } = detectarRepositorio();
-    const respuesta = await fetch(
+    const respuesta = await fetchConLimite(
         `https://api.github.com/repos/${encodeURIComponent(propietario)}/` +
         `${encodeURIComponent(nombre)}/contents`,
         {
@@ -166,17 +191,12 @@ async function obtenerProyectosDeRespaldo() {
     return Array.isArray(datos.proyectos) ? datos.proyectos : [];
 }
 
-async function obtenerProyectos() {
-    try {
-        return await obtenerProyectosDesdeGitHub();
-    } catch (errorApi) {
-        console.warn("Se utilizará la lista local de respaldo.", errorApi);
-        return obtenerProyectosDeRespaldo();
-    }
-}
-
 function mostrarImagenAlternativa(contenedor) {
-    contenedor.querySelector("img")?.remove();
+    const imagenAnterior = contenedor.querySelector("img");
+
+    if (imagenAnterior) {
+        imagenAnterior.remove();
+    }
 
     if (contenedor.querySelector(".imagen-alternativa")) {
         return;
@@ -279,7 +299,7 @@ function obtenerListaVisible() {
 
 function mostrarProyectos() {
     const lista = obtenerListaVisible();
-    contenedorProyectos.replaceChildren();
+    contenedorProyectos.innerHTML = "";
 
     elementoContador.textContent = lista.length === proyectos.length
         ? `${proyectos.length} ${proyectos.length === 1 ? "proyecto" : "proyectos"}`
@@ -306,12 +326,30 @@ function mostrarProyectos() {
 }
 
 async function cargarProyectos() {
+    let respaldoCargado = false;
+
     try {
-        proyectos = await obtenerProyectos();
+        proyectos = await obtenerProyectosDeRespaldo();
+        respaldoCargado = true;
         elementoTotal.textContent = proyectos.length;
         mostrarProyectos();
-    } catch (error) {
-        console.error(error);
+    } catch (errorRespaldo) {
+        console.warn("No se pudo leer la lista local de respaldo.", errorRespaldo);
+    }
+
+    try {
+        const proyectosActualizados = await obtenerProyectosDesdeGitHub();
+
+        proyectos = proyectosActualizados;
+        elementoTotal.textContent = proyectos.length;
+        mostrarProyectos();
+    } catch (errorGitHub) {
+        console.warn("No se pudo actualizar la lista desde GitHub.", errorGitHub);
+
+        if (respaldoCargado) {
+            return;
+        }
+
         elementoTotal.textContent = "0";
         elementoContador.textContent = "No disponible";
         contenedorProyectos.classList.add("oculto");
