@@ -1,25 +1,5 @@
 "use strict";
 
-const CONFIGURACION = {
-    usuario: "emena2006",
-    repositorio: "proyectos_info_2026",
-    rama: "main",
-
-    carpetasIgnoradas: [
-        ".github",
-        "css",
-        "js",
-        "img",
-        "images",
-        "assets",
-        "recursos",
-        "archivos",
-        "docs"
-    ]
-};
-
-const API_BASE = "https://api.github.com/repos";
-
 const contenedorProyectos =
     document.getElementById("contenedorProyectos");
 
@@ -44,186 +24,67 @@ const botonActualizar =
 let proyectos = [];
 
 /**
- * Realiza una consulta a GitHub con un límite
- * de tiempo para evitar que el spinner quede fijo.
+ * Convierte una ruta relativa en una dirección segura.
  */
-async function consultarGitHub(url) {
+function crearRuta(ruta) {
+    return ruta
+        .split("/")
+        .filter(Boolean)
+        .map(parte => encodeURIComponent(parte))
+        .join("/");
+}
+
+/**
+ * Carga proyectos.json sin utilizar la API de GitHub.
+ */
+async function obtenerProyectos() {
     const controlador = new AbortController();
 
-    const temporizador = setTimeout(() => {
+    const limiteTiempo = setTimeout(() => {
         controlador.abort();
-    }, 12000);
+    }, 10000);
 
     try {
-        const respuesta = await fetch(url, {
-            cache: "no-store",
-            signal: controlador.signal,
-            headers: {
-                Accept: "application/vnd.github+json"
+        /*
+          El parámetro evita que el navegador muestre
+          una versión antigua del archivo.
+        */
+        const respuesta = await fetch(
+            `./proyectos.json?actualizacion=${Date.now()}`,
+            {
+                cache: "no-store",
+                signal: controlador.signal
             }
-        });
+        );
 
         if (!respuesta.ok) {
             throw new Error(
-                `GitHub respondió con el código ${respuesta.status}.`
+                `No se pudo leer proyectos.json. Código ${respuesta.status}.`
             );
         }
 
-        return await respuesta.json();
+        const datos = await respuesta.json();
+
+        if (!datos || !Array.isArray(datos.proyectos)) {
+            throw new Error(
+                "El contenido de proyectos.json no es válido."
+            );
+        }
+
+        return datos.proyectos;
     } finally {
-        clearTimeout(temporizador);
+        clearTimeout(limiteTiempo);
     }
 }
 
 /**
- * Convierte el nombre de carpeta en un título.
- */
-function formatearNombre(nombre) {
-    const palabrasMinusculas = [
-        "de",
-        "del",
-        "la",
-        "las",
-        "el",
-        "los",
-        "y",
-        "en",
-        "para",
-        "con"
-    ];
-
-    return nombre
-        .replace(/[-_]+/g, " ")
-        .replace(/\s+/g, " ")
-        .trim()
-        .split(" ")
-        .map((palabra, indice) => {
-            const minuscula = palabra.toLowerCase();
-
-            if (
-                indice > 0 &&
-                palabrasMinusculas.includes(minuscula)
-            ) {
-                return minuscula;
-            }
-
-            return (
-                minuscula.charAt(0).toUpperCase() +
-                minuscula.slice(1)
-            );
-        })
-        .join(" ");
-}
-
-/**
- * Determina si una carpeta principal puede ser
- * candidata a proyecto.
- */
-function esCarpetaCandidata(elemento) {
-    if (elemento.type !== "dir") {
-        return false;
-    }
-
-    if (elemento.name.startsWith(".")) {
-        return false;
-    }
-
-    const ignoradas =
-        CONFIGURACION.carpetasIgnoradas.map(
-            nombre => nombre.toLowerCase()
-        );
-
-    return !ignoradas.includes(
-        elemento.name.toLowerCase()
-    );
-}
-
-/**
- * Revisa el contenido de una carpeta y confirma
- * que tenga un archivo index.html.
- */
-async function comprobarProyecto(carpeta) {
-    try {
-        const url =
-            `${API_BASE}/` +
-            `${CONFIGURACION.usuario}/` +
-            `${CONFIGURACION.repositorio}/contents/` +
-            `${encodeURIComponent(carpeta.name)}` +
-            `?ref=${encodeURIComponent(CONFIGURACION.rama)}`;
-
-        const contenido = await consultarGitHub(url);
-
-        if (!Array.isArray(contenido)) {
-            return null;
-        }
-
-        const tieneIndex = contenido.some(elemento => {
-            return (
-                elemento.type === "file" &&
-                elemento.name.toLowerCase() === "index.html"
-            );
-        });
-
-        if (!tieneIndex) {
-            return null;
-        }
-
-        const tienePreview = contenido.some(elemento => {
-            const nombre = elemento.name.toLowerCase();
-
-            return (
-                elemento.type === "file" &&
-                (
-                    nombre === "preview.png" ||
-                    nombre === "preview.jpg" ||
-                    nombre === "preview.jpeg" ||
-                    nombre === "preview.webp"
-                )
-            );
-        });
-
-        const archivoPreview = contenido.find(elemento => {
-            const nombre = elemento.name.toLowerCase();
-
-            return (
-                elemento.type === "file" &&
-                (
-                    nombre === "preview.png" ||
-                    nombre === "preview.jpg" ||
-                    nombre === "preview.jpeg" ||
-                    nombre === "preview.webp"
-                )
-            );
-        });
-
-        return {
-            nombre: carpeta.name,
-            titulo: formatearNombre(carpeta.name),
-            enlace:
-                `./${encodeURIComponent(carpeta.name)}/`,
-            preview: tienePreview
-                ? `./${encodeURIComponent(carpeta.name)}/` +
-                archivoPreview.name
-                : null
-        };
-    } catch (error) {
-        console.warn(
-            `No se pudo revisar ${carpeta.name}:`,
-            error
-        );
-
-        return null;
-    }
-}
-
-/**
- * Crea una card para un proyecto.
+ * Crea el elemento visual de una card.
  */
 function crearTarjeta(proyecto, indice) {
     const tarjeta = document.createElement("a");
 
     tarjeta.className = "tarjeta-proyecto";
-    tarjeta.href = proyecto.enlace;
+    tarjeta.href = `./${crearRuta(proyecto.enlace)}/`;
 
     tarjeta.setAttribute(
         "aria-label",
@@ -238,33 +99,17 @@ function crearTarjeta(proyecto, indice) {
     if (proyecto.preview) {
         const imagen = document.createElement("img");
 
-        imagen.src = proyecto.preview;
-        imagen.alt =
-            `Vista previa del proyecto ${proyecto.titulo}`;
-
+        imagen.src = `./${crearRuta(proyecto.preview)}`;
+        imagen.alt = `Vista previa de ${proyecto.titulo}`;
         imagen.loading = "lazy";
 
         imagen.addEventListener("error", () => {
-            imagen.remove();
-
-            const alternativa =
-                document.createElement("div");
-
-            alternativa.className = "imagen-alternativa";
-            alternativa.textContent = "🧩";
-
-            contenedorImagen.prepend(alternativa);
+            mostrarImagenAlternativa(contenedorImagen);
         });
 
         contenedorImagen.appendChild(imagen);
     } else {
-        const alternativa =
-            document.createElement("div");
-
-        alternativa.className = "imagen-alternativa";
-        alternativa.textContent = "🧩";
-
-        contenedorImagen.appendChild(alternativa);
+        mostrarImagenAlternativa(contenedorImagen);
     }
 
     const numero = document.createElement("span");
@@ -290,68 +135,112 @@ function crearTarjeta(proyecto, indice) {
     const descripcion = document.createElement("p");
 
     descripcion.textContent =
-        "Aplicación web desarrollada por estudiantes " +
-        "de Desarrollo de pequeñas aplicaciones de software.";
+        "Aplicación desarrollada por estudiantes de " +
+        "Desarrollo de pequeñas aplicaciones de software.";
+
+    const tecnologias =
+        document.createElement("div");
+
+    tecnologias.className = "tarjeta-tecnologias";
+
+    ["HTML", "CSS", "JavaScript"].forEach(nombre => {
+        const tecnologia = document.createElement("span");
+
+        tecnologia.className = "tecnologia";
+        tecnologia.textContent = nombre;
+
+        tecnologias.appendChild(tecnologia);
+    });
 
     const accion = document.createElement("div");
 
     accion.className = "tarjeta-accion";
 
-    const texto = document.createElement("span");
-    texto.textContent = "Abrir proyecto";
+    const textoAccion = document.createElement("span");
+    textoAccion.textContent = "Abrir proyecto";
 
     const flecha = document.createElement("span");
     flecha.textContent = "→";
 
-    accion.append(texto, flecha);
+    accion.append(textoAccion, flecha);
 
     contenido.append(
         etiqueta,
         titulo,
         descripcion,
+        tecnologias,
         accion
     );
 
-    tarjeta.append(contenedorImagen, contenido);
+    tarjeta.append(
+        contenedorImagen,
+        contenido
+    );
 
     return tarjeta;
 }
 
 /**
- * Ordena y filtra los proyectos.
+ * Muestra un ícono cuando no existe preview.
+ */
+function mostrarImagenAlternativa(contenedor) {
+    const imagenAnterior =
+        contenedor.querySelector("img");
+
+    if (imagenAnterior) {
+        imagenAnterior.remove();
+    }
+
+    if (
+        contenedor.querySelector(".imagen-alternativa")
+    ) {
+        return;
+    }
+
+    const alternativa = document.createElement("div");
+
+    alternativa.className = "imagen-alternativa";
+    alternativa.textContent = "🧩";
+
+    contenedor.prepend(alternativa);
+}
+
+/**
+ * Filtra y ordena la lista.
  */
 function obtenerListaVisible() {
     const consulta =
         buscador.value.trim().toLowerCase();
 
-    const filtrados = proyectos.filter(proyecto => {
+    const lista = proyectos.filter(proyecto => {
         return (
-            proyecto.nombre.toLowerCase().includes(consulta) ||
-            proyecto.titulo.toLowerCase().includes(consulta)
+            proyecto.titulo
+                .toLowerCase()
+                .includes(consulta) ||
+            proyecto.carpeta
+                .toLowerCase()
+                .includes(consulta)
         );
     });
 
-    filtrados.sort((a, b) => {
-        if (selectorOrden.value === "nombre-desc") {
-            return b.titulo.localeCompare(
-                a.titulo,
+    lista.sort((a, b) => {
+        const comparacion =
+            a.titulo.localeCompare(
+                b.titulo,
                 "es",
                 { sensitivity: "base" }
             );
-        }
 
-        return a.titulo.localeCompare(
-            b.titulo,
-            "es",
-            { sensitivity: "base" }
-        );
+        return selectorOrden.value === "nombre-desc"
+            ? -comparacion
+            : comparacion;
     });
 
-    return filtrados;
+    return lista;
 }
 
 /**
- * Dibuja las cards.
+ * Muestra las cards.
  */
 function mostrarProyectos() {
     const lista = obtenerListaVisible();
@@ -360,8 +249,9 @@ function mostrarProyectos() {
 
     if (lista.length === proyectos.length) {
         elementoContador.textContent =
-            `${proyectos.length} ` +
-            `${proyectos.length === 1 ? "proyecto" : "proyectos"}`;
+            proyectos.length === 1
+                ? "1 proyecto"
+                : `${proyectos.length} proyectos`;
     } else {
         elementoContador.textContent =
             `${lista.length} de ${proyectos.length} proyectos`;
@@ -376,10 +266,14 @@ function mostrarProyectos() {
         elementoEstado.innerHTML = `
       <div>
         <span class="estado-icono">📂</span>
-        <strong>No se encontraron proyectos</strong>
+
+        <strong>
+          No se encontraron proyectos
+        </strong>
+
         <p>
-          Cada carpeta debe contener un archivo
-          llamado index.html.
+          Cada carpeta de proyecto debe contener
+          un archivo index.html.
         </p>
       </div>
     `;
@@ -398,11 +292,11 @@ function mostrarProyectos() {
 }
 
 /**
- * Consulta las carpetas y valida cada proyecto.
+ * Inicia o actualiza la galería.
  */
 async function cargarProyectos() {
     botonActualizar.disabled = true;
-    botonActualizar.textContent = "Buscando…";
+    botonActualizar.textContent = "Cargando…";
 
     contenedorProyectos.classList.add("oculto");
 
@@ -411,37 +305,13 @@ async function cargarProyectos() {
 
     elementoEstado.innerHTML = `
     <div class="cargador"></div>
-    <p>Buscando proyectos publicados…</p>
+    <p>Cargando proyectos publicados…</p>
   `;
 
     elementoContador.textContent = "Cargando…";
 
     try {
-        const urlRaiz =
-            `${API_BASE}/` +
-            `${CONFIGURACION.usuario}/` +
-            `${CONFIGURACION.repositorio}/contents` +
-            `?ref=${encodeURIComponent(CONFIGURACION.rama)}`;
-
-        const contenidoRaiz =
-            await consultarGitHub(urlRaiz);
-
-        if (!Array.isArray(contenidoRaiz)) {
-            throw new Error(
-                "GitHub no devolvió una lista válida."
-            );
-        }
-
-        const carpetas =
-            contenidoRaiz.filter(esCarpetaCandidata);
-
-        const resultados = await Promise.all(
-            carpetas.map(comprobarProyecto)
-        );
-
-        proyectos = resultados.filter(
-            proyecto => proyecto !== null
-        );
+        proyectos = await obtenerProyectos();
 
         elementoTotal.textContent = proyectos.length;
 
@@ -463,8 +333,7 @@ async function cargarProyectos() {
 
         const mensaje =
             error.name === "AbortError"
-                ? "La consulta tardó demasiado. " +
-                "Presiona Actualizar para intentarlo nuevamente."
+                ? "La carga tardó demasiado. Intenta actualizar."
                 : error.message;
 
         elementoEstado.innerHTML = `
@@ -484,7 +353,10 @@ async function cargarProyectos() {
     }
 }
 
-buscador.addEventListener("input", mostrarProyectos);
+buscador.addEventListener(
+    "input",
+    mostrarProyectos
+);
 
 selectorOrden.addEventListener(
     "change",

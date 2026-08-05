@@ -1,0 +1,143 @@
+name: Generar lista de proyectos
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generar-lista:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Generar proyectos.json
+        shell: bash
+        run: |
+          python3 <<'PYTHON'
+          import json
+          import os
+          import re
+          import unicodedata
+
+          CARPETAS_IGNORADAS = {
+              ".git",
+              ".github",
+              "css",
+              "js",
+              "img",
+              "images",
+              "assets",
+              "recursos",
+              "archivos",
+              "docs"
+          }
+
+          EXTENSIONES_PREVIEW = [
+              "preview.png",
+              "preview.jpg",
+              "preview.jpeg",
+              "preview.webp"
+          ]
+
+          def crear_titulo(nombre):
+              nombre = re.sub(r"[-_]+", " ", nombre)
+              nombre = re.sub(r"\s+", " ", nombre).strip()
+
+              palabras_menores = {
+                  "de", "del", "la", "las", "el",
+                  "los", "y", "en", "para", "con"
+              }
+
+              resultado = []
+
+              for indice, palabra in enumerate(nombre.split()):
+                  minuscula = palabra.lower()
+
+                  if indice > 0 and minuscula in palabras_menores:
+                      resultado.append(minuscula)
+                  else:
+                      resultado.append(minuscula.capitalize())
+
+              return " ".join(resultado)
+
+          proyectos = []
+
+          for nombre in sorted(os.listdir(".")):
+              ruta = os.path.join(".", nombre)
+
+              if not os.path.isdir(ruta):
+                  continue
+
+              if nombre.startswith("."):
+                  continue
+
+              if nombre.lower() in CARPETAS_IGNORADAS:
+                  continue
+
+              archivo_index = os.path.join(ruta, "index.html")
+
+              if not os.path.isfile(archivo_index):
+                  continue
+
+              preview = None
+
+              for archivo_preview in EXTENSIONES_PREVIEW:
+                  ruta_preview = os.path.join(ruta, archivo_preview)
+
+                  if os.path.isfile(ruta_preview):
+                      preview = f"{nombre}/{archivo_preview}"
+                      break
+
+              proyectos.append({
+                  "carpeta": nombre,
+                  "titulo": crear_titulo(nombre),
+                  "enlace": f"{nombre}/",
+                  "preview": preview
+              })
+
+          contenido = {
+              "cantidad": len(proyectos),
+              "proyectos": proyectos
+          }
+
+          with open(
+              "proyectos.json",
+              "w",
+              encoding="utf-8"
+          ) as archivo:
+              json.dump(
+                  contenido,
+                  archivo,
+                  ensure_ascii=False,
+                  indent=2
+              )
+
+              archivo.write("\n")
+
+          print(
+              f"Se encontraron {len(proyectos)} proyectos."
+          )
+          PYTHON
+
+      - name: Guardar proyectos.json
+        shell: bash
+        run: |
+          if git diff --quiet proyectos.json; then
+            echo "La lista de proyectos no cambió."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add proyectos.json
+          git commit -m "Actualizar lista automática de proyectos"
+          git push
