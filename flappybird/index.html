@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Flappy Bird - Edición Matemática</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="game-wrapper">
+        <div class="game-dashboard">
+            <!-- ===== PANEL IZQUIERDO: Controles e información ===== -->
+            <aside class="left-panel">
+                <header class="panel-header">
+                    <h1>🐦 FLAPPY</h1>
+                    <div class="subtitle">✧ Edición Matemática ✧</div>
+                </header>
+
+                <!-- CRÉDITO DEL CREADOR -->
+                <div class="creator-credit">
+                    <span>✧ Hecho por <span class="highlight">Matías</span> · 11-5 ✧</span>
+                </div>
+
+                <!-- Datos del jugador -->
+                <section class="player-card">
+                    <label for="playerNameInput">👤 Piloto</label>
+                    <input type="text" id="playerNameInput" placeholder="Tu nombre..." value="Aviador" />
+                </section>
+
+                <!-- Selector de color del ave -->
+                <section class="color-selector">
+                    <label>🎨 Color de ave</label>
+                    <div class="color-options">
+                        <div class="color-option active" style="background: #f7d44a;" data-color="yellow"></div>
+                        <div class="color-option" style="background: #ff6b6b;" data-color="red"></div>
+                        <div class="color-option" style="background: #4ecdc4;" data-color="teal"></div>
+                        <div class="color-option" style="background: #a29bfe;" data-color="purple"></div>
+                        <div class="color-option" style="background: #fd79a8;" data-color="pink"></div>
+                    </div>
+                </section>
+
+                <!-- Puntaje actual -->
+                <section class="score-box">
+                    <span>🏆 Puntaje</span>
+                    <span id="currentScore">0</span>
+                </section>
+
+                <!-- Tabla de récords -->
+                <section class="high-scores-container">
+                    <div class="high-score-title">
+                        <span>📋 Récords</span>
+                        <span>🏅</span>
+                    </div>
+                    <div class="high-score-list" id="highScoreList">
+                        <div class="hs-item" style="justify-content:center; color:#6d8fa3;">— sin récords —</div>
+                    </div>
+                </section>
+
+                <!-- Banner para revivir (se muestra cuando el pájaro muere) -->
+                <section class="revive-banner" id="reviveBanner">
+                    <span>💫 Revivir: <span id="reviveEquation">5 × 3 = ?</span></span>
+                    <button class="btn btn-small" id="reviveBtn">Responder</button>
+                </section>
+            </aside>
+
+            <!-- ===== PANEL DERECHO: Canvas y acciones del juego ===== -->
+            <main class="right-panel">
+                <div class="canvas-container">
+                    <canvas id="gameCanvas" width="400" height="600"></canvas>
+                </div>
+
+                <!-- Botones de control -->
+                <div class="canvas-controls">
+                    <button class="btn btn-primary" id="startGameBtn">🚀 Iniciar</button>
+                    <button class="btn btn-restart" id="restartBtn">🔄 Reiniciar</button>
+                    <button class="btn btn-sound" id="soundBtn">🔊 Sonido</button>
+                </div>
+
+                <!-- Tips de juego -->
+                <div class="game-tips">
+                    <span>⌨️ Espacio o ↑ para saltar</span>
+                    <span>🖱️ Click en el juego</span>
+                    <span>🧮 Resuelve para revivir</span>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Cargar el script al final para que el DOM esté listo -->
+    <script src="script.js"></script>
+</body>
+</html>
