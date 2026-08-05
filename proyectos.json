@@ -9,7 +9,11 @@
     },
     {
       "carpeta": "flappybird",
+<<<<<<< HEAD
       "titulo": "Flappy Bird - Edición Matemática",
+=======
+      "titulo": "Flappybird",
+>>>>>>> 297a7cbf48b64e11a2f0f6fa6355830be8254731
       "enlace": "flappybird/",
       "preview": null
     }
