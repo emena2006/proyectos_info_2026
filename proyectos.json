@@ -1,11 +1,11 @@
 {
-    "cantidad": 1,
-    "proyectos": [
-        {
-            "carpeta": "culebra",
-            "titulo": "Culebra",
-            "enlace": "culebra/",
-            "preview": null
-        }
-    ]
+  "cantidad": 1,
+  "proyectos": [
+    {
+      "carpeta": "culebra",
+      "titulo": "Culebra",
+      "enlace": "culebra/",
+      "preview": null
+    }
+  ]
 }
