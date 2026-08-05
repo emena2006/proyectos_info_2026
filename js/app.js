@@ -1,31 +1,32 @@
 "use strict";
 
-const contenedorProyectos =
-    document.getElementById("contenedorProyectos");
+const contenedorProyectos = document.getElementById("contenedorProyectos");
+const elementoEstado = document.getElementById("estado");
+const elementoContador = document.getElementById("contador");
+const elementoTotal = document.getElementById("totalProyectos");
+const buscador = document.getElementById("buscador");
+const selectorOrden = document.getElementById("ordenProyectos");
 
-const elementoEstado =
-    document.getElementById("estado");
+const CARPETAS_IGNORADAS = new Set([
+    ".git",
+    ".github",
+    "assets",
+    "archivos",
+    "css",
+    "docs",
+    "images",
+    "img",
+    "js",
+    "recursos"
+]);
 
-const elementoContador =
-    document.getElementById("contador");
-
-const elementoTotal =
-    document.getElementById("totalProyectos");
-
-const buscador =
-    document.getElementById("buscador");
-
-const selectorOrden =
-    document.getElementById("ordenProyectos");
-
-const botonActualizar =
-    document.getElementById("botonActualizar");
+const REPOSITORIO_PREDETERMINADO = {
+    propietario: "emena2006",
+    nombre: "proyectos_info_2026"
+};
 
 let proyectos = [];
 
-/**
- * Convierte una ruta relativa en una dirección segura.
- */
 function crearRuta(ruta) {
     return ruta
         .split("/")
@@ -34,338 +35,296 @@ function crearRuta(ruta) {
         .join("/");
 }
 
-/**
- * Carga proyectos.json sin utilizar la API de GitHub.
- */
-async function obtenerProyectos() {
-    const controlador = new AbortController();
+function crearTitulo(nombreCarpeta) {
+    const palabrasMenores = new Set([
+        "con", "de", "del", "el", "en", "la", "las", "los", "para", "y"
+    ]);
 
-    const limiteTiempo = setTimeout(() => {
-        controlador.abort();
-    }, 10000);
+    return nombreCarpeta
+        .replace(/[-_]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .split(" ")
+        .map((palabra, indice) => {
+            const minuscula = palabra.toLocaleLowerCase("es");
 
-    try {
-        /*
-          El parámetro evita que el navegador muestre
-          una versión antigua del archivo.
-        */
-        const respuesta = await fetch(
-            `./proyectos.json?actualizacion=${Date.now()}`,
-            {
-                cache: "no-store",
-                signal: controlador.signal
+            if (indice > 0 && palabrasMenores.has(minuscula)) {
+                return minuscula;
             }
+
+            return minuscula.charAt(0).toLocaleUpperCase("es") +
+                minuscula.slice(1);
+        })
+        .join(" ");
+}
+
+/**
+ * Obtiene usuario y repositorio desde una URL normal de GitHub Pages.
+ * El valor predeterminado permite probar la portada fuera de Pages.
+ */
+function detectarRepositorio() {
+    const partesHost = window.location.hostname.split(".");
+
+    if (
+        partesHost.length >= 3 &&
+        partesHost.slice(-2).join(".") === "github.io"
+    ) {
+        const propietario = partesHost[0];
+        const primerSegmento = window.location.pathname
+            .split("/")
+            .filter(Boolean)[0];
+
+        return {
+            propietario,
+            nombre: primerSegmento || `${propietario}.github.io`
+        };
+    }
+
+    return REPOSITORIO_PREDETERMINADO;
+}
+
+/**
+ * Lee el index de una carpeta para confirmar que es un micrositio y obtener
+ * un nombre comprensible. Si no responde, esa carpeta no es un proyecto.
+ */
+async function leerMicrositio(carpeta) {
+    try {
+        const respuesta = await fetch(
+            `./${crearRuta(carpeta)}/index.html`,
+            { cache: "no-store" }
         );
 
         if (!respuesta.ok) {
-            throw new Error(
-                `No se pudo leer proyectos.json. Código ${respuesta.status}.`
-            );
+            return null;
         }
 
-        const datos = await respuesta.json();
+        const html = await respuesta.text();
+        const documento = new DOMParser().parseFromString(html, "text/html");
+        const tituloDocumento = documento.querySelector("title")
+            ?.textContent.trim();
+        const descripcion = documento.querySelector('meta[name="description"]')
+            ?.getAttribute("content")?.trim();
 
-        if (!datos || !Array.isArray(datos.proyectos)) {
-            throw new Error(
-                "El contenido de proyectos.json no es válido."
-            );
-        }
-
-        return datos.proyectos;
-    } finally {
-        clearTimeout(limiteTiempo);
+        return {
+            carpeta,
+            titulo: tituloDocumento || crearTitulo(carpeta),
+            descripcion: descripcion || "Aplicación creada por estudiantes del Liceo Unesco.",
+            enlace: carpeta
+        };
+    } catch (error) {
+        console.warn(`No se pudo revisar la carpeta ${carpeta}.`, error);
+        return null;
     }
 }
 
 /**
- * Crea el elemento visual de una card.
+ * Lista las carpetas directamente desde el repositorio público. No requiere
+ * proyectos.json ni un workflow: subir una carpeta con index.html es suficiente.
  */
-function crearTarjeta(proyecto, indice) {
-    const tarjeta = document.createElement("a");
-
-    tarjeta.className = "tarjeta-proyecto";
-    tarjeta.href = `./${crearRuta(proyecto.enlace)}/`;
-
-    tarjeta.setAttribute(
-        "aria-label",
-        `Abrir el proyecto ${proyecto.titulo}`
+async function obtenerProyectosDesdeGitHub() {
+    const { propietario, nombre } = detectarRepositorio();
+    const respuesta = await fetch(
+        `https://api.github.com/repos/${encodeURIComponent(propietario)}/` +
+        `${encodeURIComponent(nombre)}/contents`,
+        {
+            cache: "no-store",
+            headers: { Accept: "application/vnd.github+json" }
+        }
     );
 
-    const contenedorImagen =
-        document.createElement("div");
-
-    contenedorImagen.className = "tarjeta-imagen";
-
-    if (proyecto.preview) {
-        const imagen = document.createElement("img");
-
-        imagen.src = `./${crearRuta(proyecto.preview)}`;
-        imagen.alt = `Vista previa de ${proyecto.titulo}`;
-        imagen.loading = "lazy";
-
-        imagen.addEventListener("error", () => {
-            mostrarImagenAlternativa(contenedorImagen);
-        });
-
-        contenedorImagen.appendChild(imagen);
-    } else {
-        mostrarImagenAlternativa(contenedorImagen);
+    if (!respuesta.ok) {
+        throw new Error(`GitHub respondió con el código ${respuesta.status}.`);
     }
 
+    const contenido = await respuesta.json();
+    const carpetas = contenido
+        .filter(elemento => {
+            return elemento.type === "dir" &&
+                !elemento.name.startsWith(".") &&
+                !CARPETAS_IGNORADAS.has(elemento.name.toLocaleLowerCase("es"));
+        })
+        .map(elemento => elemento.name);
+
+    const resultados = await Promise.all(carpetas.map(leerMicrositio));
+    return resultados.filter(Boolean);
+}
+
+/**
+ * Respaldo para vista local o interrupciones temporales de la API pública.
+ */
+async function obtenerProyectosDeRespaldo() {
+    const respuesta = await fetch(
+        `./proyectos.json?actualizacion=${Date.now()}`,
+        { cache: "no-store" }
+    );
+
+    if (!respuesta.ok) {
+        throw new Error("No fue posible consultar la lista de proyectos.");
+    }
+
+    const datos = await respuesta.json();
+    return Array.isArray(datos.proyectos) ? datos.proyectos : [];
+}
+
+async function obtenerProyectos() {
+    try {
+        return await obtenerProyectosDesdeGitHub();
+    } catch (errorApi) {
+        console.warn("Se utilizará la lista local de respaldo.", errorApi);
+        return obtenerProyectosDeRespaldo();
+    }
+}
+
+function mostrarImagenAlternativa(contenedor) {
+    contenedor.querySelector("img")?.remove();
+
+    if (contenedor.querySelector(".imagen-alternativa")) {
+        return;
+    }
+
+    const alternativa = document.createElement("div");
+    alternativa.className = "imagen-alternativa";
+    alternativa.setAttribute("aria-hidden", "true");
+    alternativa.textContent = "🧩";
+    contenedor.prepend(alternativa);
+}
+
+function agregarPreview(contenedor, proyecto) {
+    const extensiones = ["png", "jpg", "jpeg", "webp"];
+    let indice = 0;
+    const imagen = document.createElement("img");
+
+    imagen.alt = `Vista previa de ${proyecto.titulo}`;
+    imagen.loading = "lazy";
+
+    const probarSiguiente = () => {
+        if (indice >= extensiones.length) {
+            mostrarImagenAlternativa(contenedor);
+            return;
+        }
+
+        imagen.src = `./${crearRuta(proyecto.carpeta)}/preview.${extensiones[indice]}`;
+        indice += 1;
+    };
+
+    imagen.addEventListener("error", probarSiguiente);
+    contenedor.appendChild(imagen);
+    probarSiguiente();
+}
+
+function crearTarjeta(proyecto, indice) {
+    const tarjeta = document.createElement("a");
+    tarjeta.className = "tarjeta-proyecto";
+    tarjeta.href = `./${crearRuta(proyecto.enlace)}/`;
+    tarjeta.setAttribute("aria-label", `Ver el proyecto ${proyecto.titulo}`);
+
+    const contenedorImagen = document.createElement("div");
+    contenedorImagen.className = "tarjeta-imagen";
+    agregarPreview(contenedorImagen, proyecto);
+
     const numero = document.createElement("span");
-
     numero.className = "tarjeta-numero";
-    numero.textContent =
-        `Proyecto ${String(indice + 1).padStart(2, "0")}`;
-
+    numero.textContent = `Proyecto ${String(indice + 1).padStart(2, "0")}`;
     contenedorImagen.appendChild(numero);
 
     const contenido = document.createElement("div");
-
     contenido.className = "tarjeta-contenido";
 
     const etiqueta = document.createElement("span");
-
     etiqueta.className = "tarjeta-etiqueta";
-    etiqueta.textContent = "Proyecto educativo";
+    etiqueta.textContent = "Listo para explorar";
 
     const titulo = document.createElement("h3");
     titulo.textContent = proyecto.titulo;
 
     const descripcion = document.createElement("p");
-
-    descripcion.textContent =
-        "Aplicación desarrollada por estudiantes de " +
-        "Desarrollo de pequeñas aplicaciones de software.";
-
-    const tecnologias =
-        document.createElement("div");
-
-    tecnologias.className = "tarjeta-tecnologias";
-
-    ["HTML", "CSS", "JavaScript"].forEach(nombre => {
-        const tecnologia = document.createElement("span");
-
-        tecnologia.className = "tecnologia";
-        tecnologia.textContent = nombre;
-
-        tecnologias.appendChild(tecnologia);
-    });
+    descripcion.textContent = proyecto.descripcion ||
+        "Aplicación creada por estudiantes del Liceo Unesco.";
 
     const accion = document.createElement("div");
-
     accion.className = "tarjeta-accion";
 
     const textoAccion = document.createElement("span");
-    textoAccion.textContent = "Abrir proyecto";
+    textoAccion.textContent = "Ver proyecto";
 
     const flecha = document.createElement("span");
+    flecha.setAttribute("aria-hidden", "true");
     flecha.textContent = "→";
 
     accion.append(textoAccion, flecha);
-
-    contenido.append(
-        etiqueta,
-        titulo,
-        descripcion,
-        tecnologias,
-        accion
-    );
-
-    tarjeta.append(
-        contenedorImagen,
-        contenido
-    );
-
+    contenido.append(etiqueta, titulo, descripcion, accion);
+    tarjeta.append(contenedorImagen, contenido);
     return tarjeta;
 }
 
-/**
- * Muestra un ícono cuando no existe preview.
- */
-function mostrarImagenAlternativa(contenedor) {
-    const imagenAnterior =
-        contenedor.querySelector("img");
-
-    if (imagenAnterior) {
-        imagenAnterior.remove();
-    }
-
-    if (
-        contenedor.querySelector(".imagen-alternativa")
-    ) {
-        return;
-    }
-
-    const alternativa = document.createElement("div");
-
-    alternativa.className = "imagen-alternativa";
-    alternativa.textContent = "🧩";
-
-    contenedor.prepend(alternativa);
-}
-
-/**
- * Filtra y ordena la lista.
- */
 function obtenerListaVisible() {
-    const consulta =
-        buscador.value.trim().toLowerCase();
-
+    const consulta = buscador.value.trim().toLocaleLowerCase("es");
     const lista = proyectos.filter(proyecto => {
-        return (
-            proyecto.titulo
-                .toLowerCase()
-                .includes(consulta) ||
-            proyecto.carpeta
-                .toLowerCase()
-                .includes(consulta)
-        );
+        return proyecto.titulo.toLocaleLowerCase("es").includes(consulta) ||
+            proyecto.carpeta.toLocaleLowerCase("es").includes(consulta);
     });
 
     lista.sort((a, b) => {
-        const comparacion =
-            a.titulo.localeCompare(
-                b.titulo,
-                "es",
-                { sensitivity: "base" }
-            );
+        const comparacion = a.titulo.localeCompare(
+            b.titulo,
+            "es",
+            { sensitivity: "base" }
+        );
 
-        return selectorOrden.value === "nombre-desc"
-            ? -comparacion
-            : comparacion;
+        return selectorOrden.value === "nombre-desc" ? -comparacion : comparacion;
     });
 
     return lista;
 }
 
-/**
- * Muestra las cards.
- */
 function mostrarProyectos() {
     const lista = obtenerListaVisible();
+    contenedorProyectos.replaceChildren();
 
-    contenedorProyectos.innerHTML = "";
-
-    if (lista.length === proyectos.length) {
-        elementoContador.textContent =
-            proyectos.length === 1
-                ? "1 proyecto"
-                : `${proyectos.length} proyectos`;
-    } else {
-        elementoContador.textContent =
-            `${lista.length} de ${proyectos.length} proyectos`;
-    }
+    elementoContador.textContent = lista.length === proyectos.length
+        ? `${proyectos.length} ${proyectos.length === 1 ? "proyecto" : "proyectos"}`
+        : `${lista.length} de ${proyectos.length} proyectos`;
 
     if (lista.length === 0) {
         contenedorProyectos.classList.add("oculto");
-
         elementoEstado.className = "estado";
         elementoEstado.classList.remove("oculto");
-
         elementoEstado.innerHTML = `
-      <div>
-        <span class="estado-icono">📂</span>
-
-        <strong>
-          No se encontraron proyectos
-        </strong>
-
-        <p>
-          Cada carpeta de proyecto debe contener
-          un archivo index.html.
-        </p>
-      </div>
-    `;
-
+            <div>
+                <span class="estado-icono" aria-hidden="true">📂</span>
+                <strong>No se encontraron proyectos</strong>
+                <p>Pruebe con otro nombre en el buscador.</p>
+            </div>`;
         return;
     }
 
     elementoEstado.classList.add("oculto");
     contenedorProyectos.classList.remove("oculto");
-
     lista.forEach((proyecto, indice) => {
-        contenedorProyectos.appendChild(
-            crearTarjeta(proyecto, indice)
-        );
+        contenedorProyectos.appendChild(crearTarjeta(proyecto, indice));
     });
 }
 
-/**
- * Inicia o actualiza la galería.
- */
 async function cargarProyectos() {
-    botonActualizar.disabled = true;
-    botonActualizar.textContent = "Cargando…";
-
-    contenedorProyectos.classList.add("oculto");
-
-    elementoEstado.className = "estado";
-    elementoEstado.classList.remove("oculto");
-
-    elementoEstado.innerHTML = `
-    <div class="cargador"></div>
-    <p>Cargando proyectos publicados…</p>
-  `;
-
-    elementoContador.textContent = "Cargando…";
-
     try {
         proyectos = await obtenerProyectos();
-
         elementoTotal.textContent = proyectos.length;
-
         mostrarProyectos();
     } catch (error) {
         console.error(error);
-
-        proyectos = [];
-
         elementoTotal.textContent = "0";
-        elementoContador.textContent = "Error";
-
+        elementoContador.textContent = "No disponible";
         contenedorProyectos.classList.add("oculto");
-
-        elementoEstado.className =
-            "estado estado-error";
-
-        elementoEstado.classList.remove("oculto");
-
-        const mensaje =
-            error.name === "AbortError"
-                ? "La carga tardó demasiado. Intenta actualizar."
-                : error.message;
-
+        elementoEstado.className = "estado estado-error";
         elementoEstado.innerHTML = `
-      <div>
-        <span class="estado-icono">⚠️</span>
-
-        <strong>
-          No fue posible cargar los proyectos
-        </strong>
-
-        <p>${mensaje}</p>
-      </div>
-    `;
-    } finally {
-        botonActualizar.disabled = false;
-        botonActualizar.textContent = "↻ Actualizar";
+            <div>
+                <span class="estado-icono" aria-hidden="true">⚠️</span>
+                <strong>No fue posible cargar los proyectos</strong>
+                <p>Revise su conexión y vuelva a cargar esta página.</p>
+            </div>`;
     }
 }
 
-buscador.addEventListener(
-    "input",
-    mostrarProyectos
-);
-
-selectorOrden.addEventListener(
-    "change",
-    mostrarProyectos
-);
-
-botonActualizar.addEventListener(
-    "click",
-    cargarProyectos
-);
-
+buscador.addEventListener("input", mostrarProyectos);
+selectorOrden.addEventListener("change", mostrarProyectos);
 cargarProyectos();

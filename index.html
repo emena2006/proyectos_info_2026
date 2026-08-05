@@ -23,6 +23,10 @@
 
 <body>
 
+  <a class="saltar-contenido" href="#proyectos">
+    Ir directamente a los proyectos
+  </a>
+
   <header class="encabezado">
     <nav class="navegacion">
       <a href="./" class="marca">
@@ -30,7 +34,7 @@
 
         <span class="marca-texto">
           <strong>Liceo Unesco</strong>
-          <small>Proyectos educativos 2026</small>
+          <small>Galería de proyectos 2026</small>
         </span>
       </a>
     </nav>
@@ -40,51 +44,34 @@
         <span class="etiqueta">Curso lectivo 2026</span>
 
         <h1>
-          Desarrollo de pequeñas aplicaciones de software
+          Proyectos creados por nuestros estudiantes
         </h1>
 
         <p>
-          Galería de ejercicios y proyectos web realizados
-          por los estudiantes del Liceo Unesco mediante
-          HTML, CSS y JavaScript.
+          Conozca y pruebe las aplicaciones desarrolladas en el
+          Liceo Unesco. Para comenzar, seleccione uno de los
+          proyectos que aparecen abajo.
         </p>
+
+        <a class="boton-principal" href="#proyectos">
+          Ver los proyectos
+          <span aria-hidden="true">↓</span>
+        </a>
 
         <div class="estadisticas">
           <div class="estadistica">
             <strong id="totalProyectos">0</strong>
-            <span>Proyectos publicados</span>
-          </div>
-
-          <div class="estadistica">
-            <strong>HTML</strong>
-            <span>Estructura</span>
-          </div>
-
-          <div class="estadistica">
-            <strong>CSS</strong>
-            <span>Diseño</span>
-          </div>
-
-          <div class="estadistica">
-            <strong>JS</strong>
-            <span>Programación</span>
+            <span>Proyectos disponibles</span>
           </div>
         </div>
       </div>
 
       <div class="presentacion-ilustracion" aria-hidden="true">
         <div class="ventana-codigo">
-          <div class="ventana-barra">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-
           <div class="lineas-codigo">
-            <span>&lt;main&gt;</span>
-            <span>&nbsp;&nbsp;const aprender = true;</span>
-            <span>&nbsp;&nbsp;crearProyecto();</span>
-            <span>&lt;/main&gt;</span>
+            <span class="ilustracion-icono">🎓</span>
+            <strong>Aprender creando</strong>
+            <span>Ideas de estudiantes hechas realidad</span>
           </div>
         </div>
       </div>
@@ -93,14 +80,17 @@
 
   <main class="contenido-principal">
 
-    <section class="panel-controles">
+    <section
+      class="panel-controles"
+      aria-label="Herramientas para encontrar proyectos"
+    >
       <div class="buscador-contenedor">
         <span class="buscador-icono">🔎</span>
 
         <input
           type="search"
           id="buscador"
-          placeholder="Buscar un proyecto..."
+          placeholder="Escriba el nombre de un proyecto"
           autocomplete="off"
           aria-label="Buscar proyectos"
         >
@@ -120,20 +110,16 @@
         </option>
       </select>
 
-      <button
-        type="button"
-        id="botonActualizar"
-        class="boton-actualizar"
-      >
-        ↻ Actualizar
-      </button>
     </section>
 
-    <section class="seccion-proyectos">
+    <section id="proyectos" class="seccion-proyectos" tabindex="-1">
       <div class="seccion-encabezado">
         <div>
           <span class="subtitulo">Galería educativa</span>
-          <h2>Proyectos de los estudiantes</h2>
+          <h2>Seleccione un proyecto</h2>
+          <p class="ayuda-proyectos">
+            Presione una tarjeta para abrir y utilizar la aplicación.
+          </p>
         </div>
 
         <span id="contador" class="contador">
