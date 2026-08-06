@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta 
+        name="viewport" 
+        content="width=device-width, initial-scale=1.0"
+    >
+    <meta 
+        name="description" 
+        content="Nannysland es un juego de plataformas interactivo donde un perro aventurero debe superar 6 niveles llenos de obstáculos, enemigos y plataformas para llegar al portal y completar su misión."
+    >
+    <meta 
+        name="author" 
+        content="Amanda Aguilar 11-5"
+    >
+    <meta 
+        name="theme-color" 
+        content="#FF6B8A"
+    >
+    <meta
+        name="keywords"
+        content="juego, plataformas, aventura, perro, parkour, niveles, obstáculos, enemigos, portal, Nannysland, pastel"
+    >
+    <meta
+        name="robots"
+        content="index, follow"
+    >
+    <meta
+        property="og:title"
+        content="Nannysland - Pastel de aventuras"
+    >
+    <meta
+        property="og:description"
+        content="Un juego de plataformas donde un perro con mucho estilo debe superar obstáculos y enemigos para llegar al portal."
+    >
+    <meta
+        property="og:type"
+        content="website"
+    >
+    <meta
+        property="og:url"
+        content="https://nannysland.com"
+    >
+    <title>Nannysland · Pastel de aventuras</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/script.js" defer></script>
+</head>
+<body>
+
+    <div class="game-wrapper">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="game-title">
+                Nannysland
+                <span class="creator">by Amanda Aguilar 11-5</span>
+            </div>
+            <div class="player-area">
+                <label>Perro</label>
+                <input type="text" id="playerName" placeholder="Tu nombre" value="Aventurero" maxlength="14">
+            </div>
+        </div>
+
+        <!-- PANTALLA DE INICIO -->
+        <div id="startScreen" class="start-screen">
+            <div class="start-content">
+                <h1>Nannysland</h1>
+                <p class="subtitle">pastel de aventuras</p>
+                <button class="btn-play" id="playBtn">PLAY</button>
+                <p class="info">perro · 6 niveles · por Amanda Aguilar 11-5</p>
+            </div>
+        </div>
+
+        <!-- CANVAS -->
+        <canvas id="gameCanvas" width="800" height="450"></canvas>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <div class="stats">
+                <span>Vidas: <span id="livesDisplay">5</span></span>
+                <span>Nivel: <span id="levelDisplay">1/6</span></span>
+                <span>Puntos: <span id="scoreDisplay">0</span></span>
+            </div>
+            <div class="controls">
+                <div class="keys">
+                    <kbd>←</kbd> <kbd>→</kbd> mover · <kbd>Espacio</kbd> saltar
+                </div>
+                <button class="btn reset" id="resetBtn">Reiniciar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT -->
+    <script src="js/script.js"></script>
+</body>
+</html>
