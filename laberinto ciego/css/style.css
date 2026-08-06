@@ -1,0 +1,228 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+#app {
+    max-width: 500px;
+    width: 100%;
+}
+
+#menu {
+    background: linear-gradient(145deg, #f8f0e6, #ffe8d6);
+    padding: 30px;
+    border-radius: 30px;
+    text-align: center;
+    border: 2px solid #fff5e6;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+#menu h1 {
+    color: #b8a090;
+    font-size: 2.2rem;
+    margin-bottom: 25px;
+}
+
+#menu-content {
+    background: rgba(255, 245, 230, 0.7);
+    padding: 20px;
+    border-radius: 20px;
+}
+
+#playerName {
+    padding: 12px 20px;
+    border: 2px solid #dccfc4;
+    border-radius: 25px;
+    background: #fffaf5;
+    color: #7a6a5e;
+    font-size: 16px;
+    width: 80%;
+    margin-bottom: 15px;
+}
+
+#characters {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.char-btn {
+    padding: 10px 15px;
+    border: 2px solid #dccfc4;
+    border-radius: 15px;
+    background: #fffaf5;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 14px;
+    color: #7a6a5e;
+    min-width: 80px;
+}
+
+.char-btn:hover {
+    transform: scale(1.05);
+}
+
+.char-btn.active {
+    background: #fff0e0;
+    border-color: #b8a090;
+    box-shadow: 0 0 15px rgba(200, 180, 165, 0.3);
+}
+
+#startBtn {
+    background: #dccfc4;
+    border: none;
+    padding: 14px 50px;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #5a4a3e;
+    border: 2px solid #fff5e6;
+    transition: all 0.3s;
+}
+
+#startBtn:hover {
+    transform: scale(1.05);
+    background: #c4b5a8;
+}
+
+#credit, #game-credit {
+    color: #b8a090;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+#game {
+    background: #1a1a1a;
+    padding: 20px;
+    border-radius: 30px;
+    border: 2px solid #2a2a2a;
+}
+
+#hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #222;
+    padding: 10px 15px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    color: #aaa;
+    flex-wrap: wrap;
+    gap: 10px;
+    border: 1px solid #333;
+}
+
+#menuBtn {
+    background: #333;
+    border: 1px solid #444;
+    color: #aaa;
+    padding: 5px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+#canvas-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: #0a0a0a;
+    border-radius: 15px;
+    border: 2px solid #2a2a2a;
+    overflow: hidden;
+}
+
+#mazeCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+#messageOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+    border-radius: 15px;
+    z-index: 10;
+}
+
+#controls {
+    display: none;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+#controls button {
+    background: #333;
+    border: 1px solid #444;
+    color: #aaa;
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    user-select: none;
+}
+
+#controls button:hover {
+    background: #444;
+}
+
+#controls button:active {
+    transform: scale(0.95);
+}
+
+#controls div {
+    display: flex;
+    gap: 10px;
+}
+
+#game-credit {
+    text-align: center;
+    color: #555;
+    margin-top: 15px;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 500px) {
+    #controls {
+        display: flex;
+    }
+    #menu h1 {
+        font-size: 1.8rem;
+    }
+    .char-btn {
+        min-width: 70px;
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    #messageOverlay {
+        font-size: 1.5rem;
+    }
+}

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laberinto a Ciegas</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- MENÚ -->
+        <div id="menu">
+            <h1>🧭 Laberinto a Ciegas</h1>
+            <div id="menu-content">
+                <input type="text" id="playerName" placeholder="Tu nombre" value="Aventurero">
+                <div id="characters">
+                    <button class="char-btn active" data-char="otter">🦦 Nutria</button>
+                    <button class="char-btn" data-char="cat">🐱 Gato</button>
+                    <button class="char-btn" data-char="unicorn">🦄 Unicornio</button>
+                </div>
+                <button id="startBtn">🎮 JUGAR</button>
+                <p id="credit">✨ Created by Andrea 11-5 ✨</p>
+            </div>
+        </div>
+
+        <!-- JUEGO -->
+        <div id="game">
+            <div id="hud">
+                <span id="playerInfo">👤 Aventurero 🦦</span>
+                <span>Nivel: <span id="levelNum">1</span>/5</span>
+                <span>Vidas: <span id="livesNum">❤️❤️❤️</span></span>
+                <button id="menuBtn">🏠 Menú</button>
+            </div>
+            <div id="canvas-container">
+                <canvas id="mazeCanvas"></canvas>
+                <div id="messageOverlay"></div>
+            </div>
+            <div id="controls">
+                <button id="upBtn">▲</button>
+                <div>
+                    <button id="leftBtn">◄</button>
+                    <button id="downBtn">▼</button>
+                    <button id="rightBtn">►</button>
+                </div>
+            </div>
+            <p id="game-credit">✨ Created by Andrea 11-5 ✨</p>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>
