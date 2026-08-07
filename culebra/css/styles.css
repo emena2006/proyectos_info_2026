@@ -1,0 +1,361 @@
+/* ==========================================================================
+   VARIABLES CSS - TEORÍA DEL COLOR (Elegante y Alto Contraste)
+   ========================================================================== */
+:root {
+    --color-principal: #10b981;   /* Verde Esmeralda Vibrante */
+    --color-secundario: #0f172a;  /* Oscuro Elegante */
+    --color-acento: #f59e0b;      /* Ámbar / Dorado */
+    --color-fondo: #090d16;       /* Fondo Oscuro Antirreflejo */
+    --color-card-bg: #1e293b;    /* Fondo de Contenedores */
+    --color-texto: #f8fafc;       /* Texto Claro Accesible */
+    --color-texto-mutado: #94a3b8;/* Texto Secundario */
+
+    --color-tablero-1: #1a2332;   /* Cuadrícula Clara */
+    --color-tablero-2: #141c2b;   /* Cuadrícula Oscura */
+    
+    --fuente-principal: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --borde-radio: 12px;
+    --sombra-box: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* Base y Prevención de Gestos Extraños en Pantalla Móvil */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    touch-action: manipulation;
+    overscroll-behavior: none; /* Evita recargar la página al deslizar verticalmente */
+}
+
+body {
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    font-family: var(--fuente-principal);
+    font-size: 16px;
+    line-height: 1.4;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    -webkit-tap-highlight-color: transparent; /* Elimina recuadro gris al presionar en iOS/Android */
+}
+
+/* ENCABEZADO COMPACTO */
+.main-header {
+    text-align: center;
+    margin-bottom: 12px;
+    width: 100%;
+    max-width: 800px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.snake-icon {
+    font-size: 1.8rem;
+    animation: pulse 2s infinite ease-in-out;
+}
+
+.main-header h1 {
+    font-size: 1.8rem;
+    color: var(--color-principal);
+    text-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+}
+
+.subtitle {
+    color: var(--color-texto-mutado);
+    font-size: 0.85rem;
+    margin-top: 2px;
+}
+
+/* LAYOUT PRINCIPAL */
+.main-container {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+}
+
+@media (min-width: 768px) {
+    .main-container {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: center;
+    }
+}
+
+/* Tarjeta de Instrucciones */
+.instructions-card {
+    background-color: var(--color-card-bg);
+    padding: 14px;
+    border-radius: var(--borde-radio);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--sombra-box);
+    width: 100%;
+    max-width: 420px;
+}
+
+.instructions-card h2 {
+    font-size: 1rem;
+    color: var(--color-acento);
+    margin-bottom: 8px;
+}
+
+.instructions-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.instructions-card li {
+    font-size: 0.85rem;
+    color: var(--color-texto-mutado);
+}
+
+.instructions-card strong {
+    color: var(--color-texto);
+}
+
+.instructions-card span {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: var(--color-principal);
+}
+
+/* ÁREA DE JUEGO */
+.game-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 420px;
+}
+
+/* MARCADOR EN GRID DE 4 COLUMNAS (Muestra Nivel y Objetivo) */
+.scoreboard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    width: 100%;
+    background-color: var(--color-card-bg);
+    padding: 10px;
+    border-radius: var(--borde-radio);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--sombra-box);
+    text-align: center;
+}
+
+.score-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.score-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: var(--color-texto-mutado);
+    font-weight: 700;
+}
+
+.score-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--color-principal);
+    line-height: 1.2;
+}
+
+#high-score { color: var(--color-acento); }
+#current-level { color: #38bdf8; }
+#apples-left { color: #f43f5e; }
+
+/* CANVAS Y CONTENEDOR TÁCTIL */
+.canvas-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--borde-radio);
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+    border: 3px solid var(--color-card-bg);
+    touch-action: none; /* Inhabilita gestos de navegador para captura fluida de Swipe */
+}
+
+#gameCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background-color: var(--color-tablero-1);
+}
+
+/* OVERLAY DE MENÚS Y OVERLAYS */
+.overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.overlay-content h2 {
+    font-size: 1.4rem;
+    color: var(--color-principal);
+    margin-bottom: 8px;
+}
+
+.overlay-content p {
+    color: var(--color-texto-mutado);
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+}
+
+/* BANNER FLOTANTE DE SUBIDA DE NIVEL */
+.level-banner {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: rgba(16, 185, 129, 0.95);
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 1.3rem;
+    font-weight: 800;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 5;
+}
+
+.level-banner.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* PANEL DE CONTROLES TÁCTILES MÓVILES ERGONÓMICOS */
+.controls-panel {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    min-height: 48px; /* Tamaño táctil mínimo recomendado por Google UX */
+    user-select: none;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn:active:not(:disabled) { transform: scale(0.96); }
+
+.btn-primary { background-color: var(--color-principal); color: #000; }
+.btn-secondary { background-color: #334155; color: var(--color-texto); }
+.btn-accent { background-color: var(--color-acento); color: #000; }
+
+/* D-PAD TÁCTIL GRANDE Y CÓMODO PARA EL PULGAR */
+.dpad-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+}
+
+.dpad-middle {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.dpad-center {
+    width: 62px;
+    height: 62px;
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+}
+
+.dpad-btn {
+    width: 62px;
+    height: 62px;
+    background-color: var(--color-card-bg);
+    color: var(--color-principal);
+    border: 1.5px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.dpad-btn:active {
+    background-color: var(--color-principal);
+    color: #090d16;
+    transform: scale(0.92);
+}
+
+/* PIE DE PÁGINA */
+.main-footer {
+    margin-top: 16px;
+    text-align: center;
+    color: var(--color-texto-mutado);
+    font-size: 0.78rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 12px;
+    width: 100%;
+    max-width: 800px;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
