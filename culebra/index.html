@@ -1,100 +1,722 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Juego interactivo de la culebra (Snake) dinámico, animado y adaptable para computadora y móvil.">
-    <meta name="author" content="Nombre Completo del Estudiante">
-    <meta name="theme-color" content="#10b981">
-    <title>Culebra Clásica - Juego Interactivo</title>
-    <link rel="stylesheet" href="./css/styles.css">
-    <script src="./js/app.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Juego de la Culebra</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      font-family: Arial, Helvetica, sans-serif;
+      color: white;
+      background: linear-gradient(135deg, #101820, #203a43, #2c5364);
+    }
+
+    .juego {
+      width: min(95vw, 520px);
+      padding: 22px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.45);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+    }
+
+    h1 {
+      margin: 0 0 15px;
+      font-size: clamp(28px, 6vw, 42px);
+    }
+
+    .informacion {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .marcador {
+      flex: 1;
+      padding: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    /* Control de velocidad */
+
+    .control-velocidad {
+      margin-bottom: 15px;
+      padding: 12px 15px;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    .control-velocidad label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    #textoVelocidad {
+      color: #ffeb3b;
+    }
+
+    #velocidad {
+      width: 100%;
+      cursor: pointer;
+      accent-color: #4caf50;
+    }
+
+    .niveles-velocidad {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px;
+      color: #d7e5db;
+      font-size: 12px;
+    }
+
+    .tablero-contenedor {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background-color: #07120b;
+      border: 4px solid #43a047;
+      border-radius: 12px;
+      image-rendering: pixelated;
+      touch-action: none;
+    }
+
+    .mensaje {
+      position: absolute;
+      inset: 0;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 12px;
+    }
+
+    .mensaje.visible {
+      display: flex;
+    }
+
+    .mensaje h2 {
+      margin: 0 0 8px;
+      font-size: 34px;
+      color: #ffeb3b;
+    }
+
+    .mensaje p {
+      margin: 5px 0 18px;
+      font-size: 18px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      color: white;
+      font-weight: bold;
+      transition: transform 0.15s, background-color 0.15s;
+    }
+
+    button:active {
+      transform: scale(0.94);
+    }
+
+    #botonReiniciar {
+      padding: 12px 22px;
+      font-size: 17px;
+      background-color: #43a047;
+    }
+
+    #botonReiniciar:hover {
+      background-color: #2e7d32;
+    }
+
+    .instrucciones {
+      margin: 15px 0 8px;
+      color: #d7e5db;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .controles {
+      width: 210px;
+      margin: 15px auto 0;
+      display: grid;
+      grid-template-columns: repeat(3, 65px);
+      grid-template-rows: repeat(2, 55px);
+      gap: 7px;
+      justify-content: center;
+    }
+
+    .control {
+      font-size: 24px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    .control:hover {
+      background: rgba(255, 255, 255, 0.28);
+    }
+
+    .arriba {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .izquierda {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .abajo {
+      grid-column: 2;
+      grid-row: 2;
+    }
+
+    .derecha {
+      grid-column: 3;
+      grid-row: 2;
+    }
+
+    @media (min-width: 700px) {
+      .controles {
+        display: none;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-    <!-- Encabezado del Juego -->
-    <header class="main-header">
-        <div class="logo-container">
-            <span class="snake-icon">🐍</span>
-            <h1>Culebra Clásica</h1>
-        </div>
-        <p class="subtitle">¡Aventúrate a comer todas las manzanas sin chocar!</p>
-    </header>
+  <main class="juego">
 
-    <!-- Contenido Principal -->
-    <main class="main-container">
+    <h1>🐍 Culebra</h1>
 
-        <!-- Área de Instrucciones -->
-        <section class="instructions-card" aria-labelledby="inst-title">
-            <h2 id="inst-title">📋 ¿Cómo jugar?</h2>
-            <ul>
-                <li><strong>Objetivo:</strong> Guía a la culebra para comer las manzanas rojas y sumar puntos.</li>
-                <li><strong>Controles PC:</strong> Usa las <span>Flechas del teclado</span> o las teclas <span>W, A, S, D</span>.</li>
-                <li><strong>Controles Móvil:</strong> Usa las flechas en pantalla.</li>
-                <li><strong>Regla de oro:</strong> Cada manzana te hace crecer y aumenta la velocidad. ¡No te estrelles con los bordes ni con tu propio cuerpo!</li>
-            </ul>
-        </section>
+    <section class="informacion">
+      <div class="marcador">
+        Puntos: <span id="puntos">0</span>
+      </div>
 
-        <!-- Área Principal del Juego y Marcador -->
-        <section class="game-wrapper">
-            <!-- Información de Estado (Marcador) -->
-            <div class="scoreboard">
-                <div class="score-box">
-                    <span class="score-label">Puntaje</span>
-                    <span id="current-score" class="score-value">0</span>
-                </div>
-                <div class="score-box">
-                    <span class="score-label">Récord</span>
-                    <span id="high-score" class="score-value">0</span>
-                </div>
-                <div class="score-box">
-                    <span class="score-label">Nivel</span>
-                    <span id="current-level" class="score-value">1</span>
-                </div>
-            </div>
+      <div class="marcador">
+        Récord: <span id="record">0</span>
+      </div>
+    </section>
 
-            <!-- Tablero de Juego (Canvas) -->
-            <div class="canvas-container">
-                <canvas id="gameCanvas" width="400" height="400"></canvas>
-                
-                <!-- Overlay de Pantalla (Bienvenida / Pausa / Game Over) -->
-                <div id="game-overlay" class="overlay active">
-                    <div class="overlay-content">
-                        <h2 id="overlay-title">🐍 ¿Listo para Jugar?</h2>
-                        <p id="overlay-message">Presiona el botón de abajo para comenzar la aventura.</p>
-                        <button id="btn-start" class="btn btn-primary">▶ Iniciar Juego</button>
-                    </div>
-                </div>
-            </div>
+    <!-- Control para modificar la velocidad -->
 
-            <!-- Panel de Controles e Interacción -->
-            <div class="controls-panel">
-                <div class="action-buttons">
-                    <button id="btn-restart" class="btn btn-secondary">🔄 Reiniciar</button>
-                    <button id="btn-pause" class="btn btn-accent" disabled>⏸ Pausa</button>
-                </div>
+    <section class="control-velocidad">
+      <label for="velocidad">
+        <span>Velocidad de la culebra</span>
+        <span id="textoVelocidad">Normal — 5</span>
+      </label>
 
-                <!-- D-Pad para Dispositivos Táctiles / Móviles -->
-                <div class="dpad-container" aria-label="Controles táctiles">
-                    <button id="btn-up" class="dpad-btn up" aria-label="Mover Arriba">▲</button>
-                    <div class="dpad-middle">
-                        <button id="btn-left" class="dpad-btn left" aria-label="Mover Izquierda">◄</button>
-                        <div class="dpad-center"></div>
-                        <button id="btn-right" class="dpad-btn right" aria-label="Mover Derecha">►</button>
-                    </div>
-                    <button id="btn-down" class="dpad-btn down" aria-label="Mover Abajo">▼</button>
-                </div>
-            </div>
-        </section>
+      <input
+        type="range"
+        id="velocidad"
+        min="1"
+        max="10"
+        value="5"
+        step="1"
+      >
 
-    </main>
+      <div class="niveles-velocidad">
+        <span>Lenta</span>
+        <span>Rápida</span>
+      </div>
+    </section>
 
-    <!-- Pie de Página -->
-    <footer class="main-footer">
-        <p><strong>Desarrollado por:</strong> Dylan Garbanzo </p>
-        <p>Sección: 11-9 | Curso Lectivo 2026</p>
-        <p>Liceo UNESCO - Tecnologías de la Información y la Comunicación</p>
-    </footer>
+    <div class="tablero-contenedor">
+
+      <canvas id="tablero" width="400" height="400"></canvas>
+
+      <div id="mensaje" class="mensaje">
+        <h2>¡Perdiste!</h2>
+
+        <p>
+          Puntuación:
+          <span id="puntosFinales">0</span>
+        </p>
+
+        <button id="botonReiniciar">
+          Jugar de nuevo
+        </button>
+      </div>
+
+    </div>
+
+    <p class="instrucciones">
+      Usa las flechas del teclado o las teclas
+      <strong>W, A, S y D</strong>.
+      Puedes cambiar la velocidad mientras juegas.
+    </p>
+
+    <section class="controles" aria-label="Controles táctiles">
+      <button class="control arriba" data-direccion="arriba">▲</button>
+      <button class="control izquierda" data-direccion="izquierda">◀</button>
+      <button class="control abajo" data-direccion="abajo">▼</button>
+      <button class="control derecha" data-direccion="derecha">▶</button>
+    </section>
+
+  </main>
+
+  <script>
+    "use strict";
+
+    const canvas = document.getElementById("tablero");
+    const contexto = canvas.getContext("2d");
+
+    const elementoPuntos = document.getElementById("puntos");
+    const elementoRecord = document.getElementById("record");
+    const elementoMensaje = document.getElementById("mensaje");
+    const elementoPuntosFinales =
+      document.getElementById("puntosFinales");
+
+    const botonReiniciar =
+      document.getElementById("botonReiniciar");
+
+    const controlVelocidad =
+      document.getElementById("velocidad");
+
+    const textoVelocidad =
+      document.getElementById("textoVelocidad");
+
+    const tamanoCelda = 20;
+    const columnas = canvas.width / tamanoCelda;
+    const filas = canvas.height / tamanoCelda;
+
+    let culebra;
+    let comida;
+    let direccion;
+    let siguienteDireccion;
+    let puntos;
+    let temporizador;
+    let juegoTerminado;
+
+    /*
+      La velocidad se maneja mediante milisegundos.
+
+      Más milisegundos = movimiento más lento.
+      Menos milisegundos = movimiento más rápido.
+    */
+
+    let nivelVelocidad = Number(controlVelocidad.value);
+    let velocidadActual = calcularVelocidad();
+
+    let record =
+      Number(localStorage.getItem("recordCulebra")) || 0;
+
+    elementoRecord.textContent = record;
+
+    function calcularVelocidad() {
+      /*
+        Nivel 1  = 230 milisegundos
+        Nivel 5  = 150 milisegundos
+        Nivel 10 = 50 milisegundos
+      */
+
+      return 250 - nivelVelocidad * 20;
+    }
+
+    function obtenerNombreVelocidad() {
+      if (nivelVelocidad <= 3) {
+        return "Lenta";
+      }
+
+      if (nivelVelocidad <= 6) {
+        return "Normal";
+      }
+
+      if (nivelVelocidad <= 8) {
+        return "Rápida";
+      }
+
+      return "Extrema";
+    }
+
+    function actualizarTextoVelocidad() {
+      textoVelocidad.textContent =
+        obtenerNombreVelocidad() + " — " + nivelVelocidad;
+    }
+
+    function iniciarJuego() {
+      clearTimeout(temporizador);
+
+      culebra = [
+        { x: 10, y: 10 },
+        { x: 9, y: 10 },
+        { x: 8, y: 10 }
+      ];
+
+      direccion = { x: 1, y: 0 };
+      siguienteDireccion = { x: 1, y: 0 };
+
+      puntos = 0;
+      juegoTerminado = false;
+
+      velocidadActual = calcularVelocidad();
+
+      elementoPuntos.textContent = puntos;
+      elementoMensaje.classList.remove("visible");
+
+      crearComida();
+      dibujar();
+      ejecutarJuego();
+    }
+
+    function ejecutarJuego() {
+      if (juegoTerminado) {
+        return;
+      }
+
+      actualizar();
+      dibujar();
+
+      temporizador = setTimeout(
+        ejecutarJuego,
+        velocidadActual
+      );
+    }
+
+    function actualizar() {
+      direccion = siguienteDireccion;
+
+      const cabezaActual = culebra[0];
+
+      const nuevaCabeza = {
+        x: cabezaActual.x + direccion.x,
+        y: cabezaActual.y + direccion.y
+      };
+
+      const chocaConPared =
+        nuevaCabeza.x < 0 ||
+        nuevaCabeza.x >= columnas ||
+        nuevaCabeza.y < 0 ||
+        nuevaCabeza.y >= filas;
+
+      const chocaConsigoMisma = culebra.some(
+        parte =>
+          parte.x === nuevaCabeza.x &&
+          parte.y === nuevaCabeza.y
+      );
+
+      if (chocaConPared || chocaConsigoMisma) {
+        terminarJuego();
+        return;
+      }
+
+      culebra.unshift(nuevaCabeza);
+
+      const comio =
+        nuevaCabeza.x === comida.x &&
+        nuevaCabeza.y === comida.y;
+
+      if (comio) {
+        puntos++;
+        elementoPuntos.textContent = puntos;
+
+        actualizarRecord();
+        crearComida();
+      } else {
+        culebra.pop();
+      }
+    }
+
+    function crearComida() {
+      let posicionValida = false;
+
+      while (!posicionValida) {
+        comida = {
+          x: Math.floor(Math.random() * columnas),
+          y: Math.floor(Math.random() * filas)
+        };
+
+        posicionValida = !culebra.some(
+          parte =>
+            parte.x === comida.x &&
+            parte.y === comida.y
+        );
+      }
+    }
+
+    function dibujar() {
+      dibujarFondo();
+      dibujarComida();
+      dibujarCulebra();
+    }
+
+    function dibujarFondo() {
+      contexto.fillStyle = "#07120b";
+      contexto.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      contexto.strokeStyle =
+        "rgba(255, 255, 255, 0.035)";
+
+      contexto.lineWidth = 1;
+
+      for (
+        let x = 0;
+        x <= canvas.width;
+        x += tamanoCelda
+      ) {
+        contexto.beginPath();
+        contexto.moveTo(x, 0);
+        contexto.lineTo(x, canvas.height);
+        contexto.stroke();
+      }
+
+      for (
+        let y = 0;
+        y <= canvas.height;
+        y += tamanoCelda
+      ) {
+        contexto.beginPath();
+        contexto.moveTo(0, y);
+        contexto.lineTo(canvas.width, y);
+        contexto.stroke();
+      }
+    }
+
+    function dibujarCulebra() {
+      culebra.forEach((parte, indice) => {
+        contexto.fillStyle =
+          indice === 0 ? "#a5d6a7" : "#43a047";
+
+        contexto.fillRect(
+          parte.x * tamanoCelda + 1,
+          parte.y * tamanoCelda + 1,
+          tamanoCelda - 2,
+          tamanoCelda - 2
+        );
+
+        if (indice === 0) {
+          dibujarOjos(parte);
+        }
+      });
+    }
+
+    function dibujarOjos(cabeza) {
+      const baseX = cabeza.x * tamanoCelda;
+      const baseY = cabeza.y * tamanoCelda;
+
+      contexto.fillStyle = "#111";
+
+      let ojo1 = { x: 6, y: 6 };
+      let ojo2 = { x: 13, y: 6 };
+
+      if (direccion.y === 1) {
+        ojo1 = { x: 6, y: 13 };
+        ojo2 = { x: 13, y: 13 };
+      } else if (direccion.x === -1) {
+        ojo1 = { x: 6, y: 6 };
+        ojo2 = { x: 6, y: 13 };
+      } else if (direccion.x === 1) {
+        ojo1 = { x: 13, y: 6 };
+        ojo2 = { x: 13, y: 13 };
+      }
+
+      contexto.beginPath();
+
+      contexto.arc(
+        baseX + ojo1.x,
+        baseY + ojo1.y,
+        2,
+        0,
+        Math.PI * 2
+      );
+
+      contexto.arc(
+        baseX + ojo2.x,
+        baseY + ojo2.y,
+        2,
+        0,
+        Math.PI * 2
+      );
+
+      contexto.fill();
+    }
+
+    function dibujarComida() {
+      const centroX =
+        comida.x * tamanoCelda + tamanoCelda / 2;
+
+      const centroY =
+        comida.y * tamanoCelda + tamanoCelda / 2;
+
+      contexto.fillStyle = "#f44336";
+      contexto.beginPath();
+
+      contexto.arc(
+        centroX,
+        centroY,
+        tamanoCelda / 2.5,
+        0,
+        Math.PI * 2
+      );
+
+      contexto.fill();
+
+      contexto.fillStyle = "#66bb6a";
+
+      contexto.fillRect(
+        centroX,
+        centroY - 11,
+        3,
+        6
+      );
+    }
+
+    function cambiarDireccion(nuevaDireccion) {
+      const direccionContraria =
+        nuevaDireccion.x === -direccion.x &&
+        nuevaDireccion.y === -direccion.y;
+
+      if (!direccionContraria) {
+        siguienteDireccion = nuevaDireccion;
+      }
+    }
+
+    function actualizarRecord() {
+      if (puntos > record) {
+        record = puntos;
+
+        localStorage.setItem(
+          "recordCulebra",
+          record
+        );
+
+        elementoRecord.textContent = record;
+      }
+    }
+
+    function terminarJuego() {
+      juegoTerminado = true;
+
+      clearTimeout(temporizador);
+
+      elementoPuntosFinales.textContent = puntos;
+      elementoMensaje.classList.add("visible");
+    }
+
+    /*
+      Cambiar la velocidad utilizando el control deslizante.
+      El cambio se aplica mientras la partida está activa.
+    */
+
+    controlVelocidad.addEventListener("input", () => {
+      nivelVelocidad = Number(controlVelocidad.value);
+      velocidadActual = calcularVelocidad();
+
+      actualizarTextoVelocidad();
+    });
+
+    document.addEventListener("keydown", event => {
+      const tecla = event.key.toLowerCase();
+
+      const teclasControl = [
+        "arrowup",
+        "arrowdown",
+        "arrowleft",
+        "arrowright",
+        "w",
+        "a",
+        "s",
+        "d"
+      ];
+
+      if (teclasControl.includes(tecla)) {
+        event.preventDefault();
+      }
+
+      switch (tecla) {
+        case "arrowup":
+        case "w":
+          cambiarDireccion({ x: 0, y: -1 });
+          break;
+
+        case "arrowdown":
+        case "s":
+          cambiarDireccion({ x: 0, y: 1 });
+          break;
+
+        case "arrowleft":
+        case "a":
+          cambiarDireccion({ x: -1, y: 0 });
+          break;
+
+        case "arrowright":
+        case "d":
+          cambiarDireccion({ x: 1, y: 0 });
+          break;
+
+        case "enter":
+          if (juegoTerminado) {
+            iniciarJuego();
+          }
+          break;
+      }
+    });
+
+    document
+      .querySelectorAll(".control")
+      .forEach(boton => {
+        boton.addEventListener("pointerdown", () => {
+          const direccionBoton =
+            boton.dataset.direccion;
+
+          const direcciones = {
+            arriba: { x: 0, y: -1 },
+            abajo: { x: 0, y: 1 },
+            izquierda: { x: -1, y: 0 },
+            derecha: { x: 1, y: 0 }
+          };
+
+          cambiarDireccion(
+            direcciones[direccionBoton]
+          );
+        });
+      });
+
+    botonReiniciar.addEventListener(
+      "click",
+      iniciarJuego
+    );
+
+    actualizarTextoVelocidad();
+    iniciarJuego();
+  </script>
 
 </body>
 </html>

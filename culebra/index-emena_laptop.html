@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Juego interactivo de la culebra (Snake) dinámico, animado y adaptable para computadora y móvil.">
+    <meta name="author" content="Nombre Completo del Estudiante">
+    <meta name="theme-color" content="#10b981">
+    <title>Culebra Clásica - Juego Interactivo</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <script src="./js/app.js" defer></script>
+</head>
+<body>
+
+    <!-- Encabezado del Juego -->
+    <header class="main-header">
+        <div class="logo-container">
+            <span class="snake-icon">🐍</span>
+            <h1>Culebra Clásica</h1>
+        </div>
+        <p class="subtitle">¡Aventúrate a comer todas las manzanas sin chocar!</p>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="main-container">
+
+        <!-- Área de Instrucciones -->
+        <section class="instructions-card" aria-labelledby="inst-title">
+            <h2 id="inst-title">📋 ¿Cómo jugar?</h2>
+            <ul>
+                <li><strong>Objetivo:</strong> Guía a la culebra para comer las manzanas rojas y sumar puntos.</li>
+                <li><strong>Controles PC:</strong> Usa las <span>Flechas del teclado</span> o las teclas <span>W, A, S, D</span>.</li>
+                <li><strong>Controles Móvil:</strong> Usa las flechas en pantalla.</li>
+                <li><strong>Regla de oro:</strong> Cada manzana te hace crecer y aumenta la velocidad. ¡No te estrelles con los bordes ni con tu propio cuerpo!</li>
+            </ul>
+        </section>
+
+        <!-- Área Principal del Juego y Marcador -->
+        <section class="game-wrapper">
+            <!-- Información de Estado (Marcador) -->
+            <div class="scoreboard">
+                <div class="score-box">
+                    <span class="score-label">Puntaje</span>
+                    <span id="current-score" class="score-value">0</span>
+                </div>
+                <div class="score-box">
+                    <span class="score-label">Récord</span>
+                    <span id="high-score" class="score-value">0</span>
+                </div>
+                <div class="score-box">
+                    <span class="score-label">Nivel</span>
+                    <span id="current-level" class="score-value">1</span>
+                </div>
+            </div>
+
+            <!-- Tablero de Juego (Canvas) -->
+            <div class="canvas-container">
+                <canvas id="gameCanvas" width="400" height="400"></canvas>
+                
+                <!-- Overlay de Pantalla (Bienvenida / Pausa / Game Over) -->
+                <div id="game-overlay" class="overlay active">
+                    <div class="overlay-content">
+                        <h2 id="overlay-title">🐍 ¿Listo para Jugar?</h2>
+                        <p id="overlay-message">Presiona el botón de abajo para comenzar la aventura.</p>
+                        <button id="btn-start" class="btn btn-primary">▶ Iniciar Juego</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Controles e Interacción -->
+            <div class="controls-panel">
+                <div class="action-buttons">
+                    <button id="btn-restart" class="btn btn-secondary">🔄 Reiniciar</button>
+                    <button id="btn-pause" class="btn btn-accent" disabled>⏸ Pausa</button>
+                </div>
+
+                <!-- D-Pad para Dispositivos Táctiles / Móviles -->
+                <div class="dpad-container" aria-label="Controles táctiles">
+                    <button id="btn-up" class="dpad-btn up" aria-label="Mover Arriba">▲</button>
+                    <div class="dpad-middle">
+                        <button id="btn-left" class="dpad-btn left" aria-label="Mover Izquierda">◄</button>
+                        <div class="dpad-center"></div>
+                        <button id="btn-right" class="dpad-btn right" aria-label="Mover Derecha">►</button>
+                    </div>
+                    <button id="btn-down" class="dpad-btn down" aria-label="Mover Abajo">▼</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Pie de Página -->
+    <footer class="main-footer">
+        <p><strong>Desarrollado por:</strong> Dylan Garbanzo </p>
+        <p>Sección: 11-9 | Curso Lectivo 2026</p>
+        <p>Liceo UNESCO - Tecnologías de la Información y la Comunicación</p>
+    </footer>
+
+</body>
+</html>
