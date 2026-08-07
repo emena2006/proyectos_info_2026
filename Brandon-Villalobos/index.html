@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Juego interactivo de sopa de letras con temática de animales y medicina veterinaria para encontrar palabras en un tablero interactivo.">
+    <meta name="author" content="Nombre Completo del Estudiante">
+    <meta name="theme-color" content="#2b6cb0">
+    <title>Sopa de Letras: Mundo Animal y Veterinaria</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <script src="./js/app.js" defer></script>
+</head>
+<body>
+
+    <!-- Encabezado con Identidad Visual -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-area">
+                <span class="logo-icon">🐾🩺</span>
+                <h1>Sopa de Letras: Veterinaria & Animales</h1>
+            </div>
+            <p class="subtitle">¡Encuentra todas las palabras ocultas sobre fauna y salud animal!</p>
+        </div>
+    </header>
+
+    <main class="container">
+        
+        <!-- Área de Instrucciones -->
+        <section class="instructions-card">
+            <h2>📖 ¿Cómo jugar?</h2>
+            <p><strong>Objetivo:</strong> Encuentra las 8 palabras ocultas relacionadas con animales y medicina veterinaria en la cuadrícula.</p>
+            <ul>
+                <li>Haz clic o toca las celdas de la palabra en orden.</li>
+                <li>Las palabras pueden estar dispuestas de forma horizontal, vertical o diagonal.</li>
+                <li>Al completar una palabra correcta, se marcará en color verde y se tachará de la lista.</li>
+                <li>¡Consigue la mayor puntuación antes de que se agote el tiempo!</li>
+            </ul>
+        </section>
+
+        <!-- Barra de Estado y Controles -->
+        <section class="game-status-bar">
+            <div class="status-item">
+                <span class="status-label">🏆 Puntaje</span>
+                <span id="score-display" class="status-value">0 pts</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">⏱️ Tiempo</span>
+                <span id="timer-display" class="status-value">03:00</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">📊 Progreso</span>
+                <span id="progress-display" class="status-value">0 / 8</span>
+            </div>
+            <div class="controls-group">
+                <button id="btn-start" class="btn btn-primary">▶️ Iniciar Juego</button>
+                <button id="btn-restart" class="btn btn-secondary" disabled>🔄 Reiniciar</button>
+            </div>
+        </section>
+
+        <!-- Área Principal del Juego -->
+        <div class="game-area">
+            
+            <!-- Tablero de la Sopa de Letras -->
+            <section class="board-section">
+                <div id="word-search-board" class="word-search-grid" aria-label="Tablero de sopa de letras">
+                    <p class="start-message">Presiona "Iniciar Juego" para comenzar.</p>
+                </div>
+            </section>
+
+            <!-- Lista de Palabras -->
+            <aside class="words-section">
+                <h3>🔍 Palabras por Encontrar</h3>
+                <ul id="word-list" class="word-list">
+                    <!-- Se genera dinámicamente mediante JS -->
+                </ul>
+            </aside>
+        </div>
+
+        <!-- Ventana de Resultado (Modal) -->
+        <div id="modal-result" class="modal hidden">
+            <div class="modal-content">
+                <h2 id="modal-title">🎉 ¡Felicidades!</h2>
+                <p id="modal-message">Has encontrado todas las palabras a tiempo.</p>
+                <p id="modal-score" class="modal-score-text">Puntaje Final: 800 pts</p>
+                <button id="btn-modal-restart" class="btn btn-primary">Jugar de Nuevo</button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Pie de Página Obligatorio -->
+    <footer class="main-footer">
+        <p>Desarrollado por: <strong>Brandon </strong> | Seccion <strong>11-9
+
+        </strong></p>
+        <p>Curso Lectivo 2026 | <strong>Liceo UNESCO</strong></p>
+    </footer>
+
+</body>
+</html>

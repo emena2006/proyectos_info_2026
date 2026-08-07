@@ -1,0 +1,385 @@
+/* ==========================================================================
+   PALETA DE COLORES Y VARIABLES CSS (Teoría del Color)
+   Temática: Veterinaria y Naturaleza (Verde clínico/hoja, Azul salud, Calidez)
+   ========================================================================== */
+:root {
+    --color-principal: #2b6cb0;     /* Azul profesional / salud */
+    --color-secundario: #2f855a;    /* Verde naturaleza / clínica */
+    --color-acento: #d69e2e;        /* Dorado calidez / destacados */
+    --color-fondo: #f0f7f4;         /* Fondo claro menta suave */
+    --color-tarjeta: #ffffff;       /* Fondo de contenedores */
+    --color-texto: #2d3748;         /* Texto oscuro legible */
+    --color-texto-suave: #4a5568;   /* Texto secundario */
+    
+    /* Estados del Juego */
+    --color-correcto: #38a169;      /* Verde éxito */
+    --color-error: #e53e3e;         /* Rojo error */
+    --color-seleccion: #ed8936;     /* Naranja selección activa */
+    --color-desactivado: #cbd5e0;   /* Gris para estado inactivo */
+    
+    --fuente-principal: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --sombra-suave: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --sombra-fuerte: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Reset y Estilos Base */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--fuente-principal);
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    line-height: 1.5;
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 16px;
+    flex: 1;
+    width: 100%;
+}
+
+/* Header */
+.main-header {
+    background-color: var(--color-principal);
+    color: white;
+    padding: 20px 16px;
+    text-align: center;
+    box-shadow: var(--sombra-suave);
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.logo-icon {
+    font-size: 2rem;
+}
+
+.main-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.subtitle {
+    font-size: 0.95rem;
+    color: #e2e8f0;
+    margin-top: 4px;
+}
+
+/* Instrucciones */
+.instructions-card {
+    background: var(--color-tarjeta);
+    border-left: 5px solid var(--color-secundario);
+    padding: 14px 18px;
+    border-radius: 8px;
+    box-shadow: var(--sombra-suave);
+    margin-bottom: 16px;
+}
+
+.instructions-card h2 {
+    font-size: 1.1rem;
+    color: var(--color-secundario);
+    margin-bottom: 6px;
+}
+
+.instructions-card ul {
+    margin-left: 18px;
+    margin-top: 4px;
+    color: var(--color-texto-suave);
+    font-size: 0.95rem;
+}
+
+/* Barra de Estado y Controles */
+.game-status-bar {
+    background: var(--color-tarjeta);
+    padding: 12px 16px;
+    border-radius: 10px;
+    box-shadow: var(--sombra-suave);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    min-width: 80px;
+}
+
+.status-label {
+    font-size: 0.75rem;
+    color: var(--color-texto-suave);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.status-value {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--color-principal);
+}
+
+.controls-group {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+@media (min-width: 600px) {
+    .controls-group {
+        width: auto;
+    }
+}
+
+/* Botones con excelente área táctil */
+.btn {
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-height: 48px;
+    touch-action: manipulation;
+}
+
+.btn-primary {
+    background-color: var(--color-secundario);
+    color: white;
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    background-color: var(--color-principal);
+    color: white;
+}
+
+.btn-secondary:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.btn:disabled {
+    background-color: var(--color-desactivado);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Área de Juego (Grid + Lista) */
+.game-area {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+}
+
+@media (min-width: 768px) {
+    .game-area {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+}
+
+.board-section {
+    flex: 2;
+    background: var(--color-tarjeta);
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: var(--sombra-suave);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    touch-action: none; /* Evita que la pantalla se mueva al seleccionar en móvil */
+}
+
+.word-search-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 4px;
+    user-select: none;
+    -webkit-user-select: none;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.start-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--color-texto-suave);
+    font-size: 1rem;
+    padding: 40px 10px;
+}
+
+.grid-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: clamp(0.9rem, 3.5vw, 1.25rem);
+    font-weight: bold;
+    color: var(--color-texto);
+    cursor: pointer;
+    touch-action: none;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.grid-cell.selected {
+    background-color: var(--color-seleccion) !important;
+    color: white !important;
+    transform: scale(0.95);
+}
+
+.grid-cell.found {
+    background-color: var(--color-correcto) !important;
+    color: white !important;
+}
+
+/* Lista de Palabras en Chips Flexibles para Móvil */
+.words-section {
+    flex: 1;
+    background: var(--color-tarjeta);
+    padding: 14px;
+    border-radius: 10px;
+    box-shadow: var(--sombra-suave);
+    width: 100%;
+}
+
+.words-section h3 {
+    font-size: 1rem;
+    color: var(--color-principal);
+    margin-bottom: 10px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 4px;
+}
+
+.word-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+@media (min-width: 768px) {
+    .word-list {
+        flex-direction: column;
+    }
+}
+
+.word-item {
+    padding: 6px 12px;
+    background-color: #edf2f7;
+    border-radius: 20px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--color-texto);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+}
+
+@media (min-width: 768px) {
+    .word-item {
+        border-radius: 6px;
+        justify-content: space-between;
+        padding: 8px 12px;
+        font-size: 0.95rem;
+    }
+}
+
+.word-item.completed {
+    background-color: #c6f6d5;
+    color: #22543d;
+    text-decoration: line-through;
+}
+
+.word-item.completed::after {
+    content: "✓";
+    font-weight: bold;
+}
+
+/* Modal de Fin de Juego */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: var(--sombra-fuerte);
+}
+
+.modal-content h2 {
+    color: var(--color-principal);
+    margin-bottom: 8px;
+    font-size: 1.4rem;
+}
+
+.modal-score-text {
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: var(--color-secundario);
+    margin: 12px 0;
+}
+
+/* Pie de Página */
+.main-footer {
+    background-color: #1a202c;
+    color: #a0aec0;
+    text-align: center;
+    padding: 16px;
+    font-size: 0.85rem;
+    margin-top: 24px;
+}
+
+.main-footer strong {
+    color: white;
+}
